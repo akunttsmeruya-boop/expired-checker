@@ -891,7 +891,7 @@ let activeScannerNumber = null;
 
 function toggleScanner(nomor) {
 
-    // Jika scanner sedang aktif
+    // Jika scanner yang sama sedang aktif
     if (
         activeScanner &&
         activeScannerNumber === nomor
@@ -903,8 +903,7 @@ function toggleScanner(nomor) {
     }
 
 
-    // Jika scanner lain sedang aktif,
-    // tutup terlebih dahulu
+    // Jika scanner lain sedang aktif
     if (activeScanner) {
 
         stopScanner(
@@ -936,16 +935,19 @@ function startScanner(nomor) {
         );
 
 
+    // Bersihkan tampilan scanner
     scannerElement.innerHTML = '';
 
     scannerElement.style.display =
         'block';
 
 
+    // Ubah tombol menjadi TUTUP
     scanButton.textContent =
         'TUTUP';
 
 
+    // Buat scanner
     const scanner =
         new Html5Qrcode(
             'scanner' + nomor
@@ -958,6 +960,10 @@ function startScanner(nomor) {
     activeScannerNumber =
         nomor;
 
+
+    // ==================================================
+    // KONFIGURASI SCANNER
+    // ==================================================
 
     const config = {
 
@@ -976,134 +982,93 @@ function startScanner(nomor) {
 
 
     // ==================================================
-    // CARI KAMERA BELAKANG
+    // BUKA KAMERA BELAKANG
     // ==================================================
 
-    Html5Qrcode.getCameras()
+    scanner.start(
 
-        .then(function(cameras) {
+        {
+            facingMode: "environment"
+        },
 
-            if (
-                !cameras ||
-                cameras.length === 0
-            ) {
+        config,
 
-                alert(
-                    'Kamera tidak ditemukan'
+        function(decodedText) {
+
+            // ==================================================
+            // BARCODE BERHASIL DIBACA
+            // ==================================================
+
+            const barcodeInput =
+                document.getElementById(
+                    'barcode' + nomor
                 );
 
-                resetScannerButton(
-                    nomor
-                );
 
-                return;
-
-            }
+            // Masukkan barcode
+            barcodeInput.value =
+                decodedText;
 
 
-            let cameraId =
-                cameras[0].id;
-
-
-            // Prioritas kamera belakang
-            for (
-                let i = 0;
-                i < cameras.length;
-                i++
-            ) {
-
-                const label =
-                    String(
-                        cameras[i].label || ''
-                    ).toLowerCase();
-
-
-                if (
-                    label.includes('back') ||
-                    label.includes('rear') ||
-                    label.includes('environment')
-                ) {
-
-                    cameraId =
-                        cameras[i].id;
-
-                    break;
-
-                }
-
-            }
+            // Bunyi beep
+            beep();
 
 
             // ==================================================
-            // START CAMERA
+            // TUTUP KAMERA TERLEBIH DAHULU
             // ==================================================
 
-            return scanner.start(
-
-                cameraId,
-
-                config,
-
-                function(decodedText) {
-
-                    // Barcode berhasil dibaca
-
-                    const barcodeInput =
-                        document.getElementById(
-                            'barcode' + nomor
-                        );
+            stopScanner(nomor);
 
 
-                    barcodeInput.value =
-                        decodedText;
+            // ==================================================
+            // CARI PRODUK
+            // ==================================================
+
+            searchProduct(nomor);
+
+        },
+
+        function(errorMessage) {
+
+            // Abaikan error scanning
+            // karena ini normal selama kamera mencari barcode
+
+        }
+
+    )
+
+    .catch(function(error) {
+
+        console.error(
+            'Scanner error:',
+            error
+        );
 
 
-                    // Beep
-                    beep();
+        alert(
+            'Tidak dapat mengakses kamera belakang'
+        );
 
 
-                    // Tutup kamera
-                    stopScanner(
-                        nomor
-                    );
+        activeScanner = null;
+
+        activeScannerNumber =
+            null;
 
 
-                    // Cari produk
-                    searchProduct(
-                        nomor
-                    );
+        scannerElement.innerHTML =
+            '';
 
-                },
-
-                function(errorMessage) {
-
-                    // Abaikan error scanning
-                    // selama proses scanning
-
-                }
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(
-                'Scanner error:',
-                error
-            );
+        scannerElement.style.display =
+            'none';
 
 
-            alert(
-                'Tidak dapat mengakses kamera'
-            );
+        resetScannerButton(
+            nomor
+        );
 
-
-            resetScannerButton(
-                nomor
-            );
-
-        });
+    });
 
 }
 
@@ -1124,7 +1089,15 @@ function stopScanner(nomor) {
         );
 
 
+    // Jika scanner tidak aktif
     if (!scanner) {
+
+        scannerElement.innerHTML =
+            '';
+
+        scannerElement.style.display =
+            'none';
+
 
         resetScannerButton(
             nomor
@@ -1135,11 +1108,16 @@ function stopScanner(nomor) {
     }
 
 
+    // ==================================================
+    // STOP KAMERA
+    // ==================================================
+
     scanner.stop()
 
         .then(function() {
 
-            activeScanner = null;
+            activeScanner =
+                null;
 
             activeScannerNumber =
                 null;
@@ -1166,7 +1144,10 @@ function stopScanner(nomor) {
             );
 
 
-            activeScanner = null;
+            // Tetap reset walaupun stop error
+
+            activeScanner =
+                null;
 
             activeScannerNumber =
                 null;
@@ -1239,30 +1220,37 @@ function beep() {
             gainNode
         );
 
+
         gainNode.connect(
             audioContext.destination
         );
 
 
+        // Frekuensi beep
         oscillator.frequency.value =
             1000;
+
 
         oscillator.type =
             'sine';
 
 
+        // Volume
         gainNode.gain.setValueAtTime(
             0.3,
             audioContext.currentTime
         );
 
 
+        // Mulai beep
         oscillator.start();
 
 
+        // Durasi 0.15 detik
         oscillator.stop(
             audioContext.currentTime + 0.15
         );
+
 
     } catch (error) {
 
