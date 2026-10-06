@@ -1,0 +1,380 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #eef2f7;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff;
+}
+
+/* HEADER */
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+    color: #1976d2;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+header p {
+    margin: 6px 0 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* PRODUCT */
+
+.product-box {
+    margin-bottom: 10px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #d7dce2;
+    border-radius: 8px;
+}
+
+.product-title {
+    margin-bottom: 9px;
+    color: #1976d2;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* BARCODE + EXPIRED */
+
+.input-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.barcode-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.expired-area {
+    width: 180px;
+    flex-shrink: 0;
+}
+
+/* NIE */
+
+.nie-area {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* LABEL */
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    color: #444;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* INPUT */
+
+input {
+    width: 100%;
+    height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #bfc6ce;
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    color: #222;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.08);
+}
+
+input::placeholder {
+    color: #999;
+}
+
+/* BARCODE SEARCH */
+
+.barcode-search {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+}
+
+.barcode-search input {
+    flex: 1;
+    min-width: 0;
+}
+
+.barcode-search button {
+    width: 85px;
+    height: 42px;
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: #1976d2;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.barcode-search button:hover {
+    background: #1565c0;
+}
+
+.barcode-search button:active {
+    transform: scale(0.98);
+}
+
+/* PRODUCT NAME */
+
+.product-name {
+    min-height: 18px;
+    margin-top: 4px;
+    color: #333333;
+    font-size: 13px;
+}
+
+/* EXPIRED HINT */
+
+.expired-area small {
+    display: block;
+    margin-top: 3px;
+    color: #777777;
+    font-size: 11px;
+}
+
+/* MESSAGE */
+
+.message {
+    display: none;
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.message.success {
+    display: block;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.message.error {
+    display: block;
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* SAVE BUTTON */
+
+#saveButton {
+    display: block;
+    width: 100%;
+    height: 50px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 7px;
+    background: #1976d2;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#saveButton:hover {
+    background: #1565c0;
+}
+
+#saveButton:active {
+    transform: scale(0.99);
+}
+
+#saveButton:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* FOOTER */
+
+footer {
+    margin-top: 20px;
+    color: #888888;
+    text-align: center;
+    font-size: 11px;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 10px;
+    }
+
+    header {
+        margin-bottom: 15px;
+    }
+
+    header h1 {
+        font-size: 23px;
+    }
+
+    header p {
+        font-size: 13px;
+    }
+
+    .product-box {
+        margin-bottom: 8px;
+        padding: 9px;
+        border-radius: 7px;
+    }
+
+    .product-title {
+        margin-bottom: 7px;
+        font-size: 14px;
+    }
+
+    /*
+        MOBILE:
+        BARCODE + EXPIRED
+        berada dalam satu baris
+    */
+
+    .input-row {
+        display: flex;
+        gap: 6px;
+        align-items: flex-start;
+    }
+
+    /*
+        BARCODE lebih lebar
+    */
+
+    .barcode-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /*
+        EXPIRED lebih kecil
+    */
+
+    .expired-area {
+        width: 105px;
+        flex-shrink: 0;
+    }
+
+    /*
+        NIE tetap satu baris penuh
+    */
+
+    .nie-area {
+        margin-top: 7px;
+    }
+
+    label {
+        margin-bottom: 3px;
+        font-size: 11px;
+    }
+
+    input {
+        height: 40px;
+        padding: 7px 8px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .barcode-search {
+        gap: 4px;
+    }
+
+    .barcode-search button {
+        width: 62px;
+        height: 40px;
+        font-size: 10px;
+    }
+
+    .product-name {
+        min-height: 15px;
+        margin-top: 3px;
+        font-size: 11px;
+    }
+
+    .expired-area small {
+        margin-top: 2px;
+        font-size: 9px;
+    }
+
+    #saveButton {
+        height: 48px;
+        margin-top: 12px;
+        font-size: 16px;
+    }
+
+    footer {
+        margin-top: 15px;
+    }
+}
+
+/* VERY SMALL MOBILE */
+
+@media (max-width: 380px) {
+
+    .container {
+        padding: 7px;
+    }
+
+    .product-box {
+        padding: 8px;
+    }
+
+    .input-row {
+        gap: 5px;
+    }
+
+    .expired-area {
+        width: 95px;
+    }
+
+    .barcode-search button {
+        width: 55px;
+        font-size: 9px;
+    }
+
+    input {
+        padding: 6px 7px;
+        font-size: 13px;
+    }
+}
