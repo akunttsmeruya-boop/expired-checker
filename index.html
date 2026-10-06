@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEK PRODUK EXPIRED</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>CEK PRODUK EXPIRED</h1>
+        <p>Scan atau masukkan barcode produk</p>
+    </header>
+
+    <main>
+
+        <!-- PRODUK 1 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 1</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode1">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode1"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(1)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName1" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired1">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired1"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin1">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin1"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PRODUK 2 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 2</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode2">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode2"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(2)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName2" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired2">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired2"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin2">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin2"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PRODUK 3 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 3</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode3">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode3"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(3)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName3" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired3">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired3"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin3">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin3"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PRODUK 4 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 4</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode4">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode4"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(4)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName4" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired4">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired4"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin4">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin4"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PRODUK 5 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 5</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode5">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode5"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(5)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName5" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired5">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired5"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin5">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin5"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PRODUK 6 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 6</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode6">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode6"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(6)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName6" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired6">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired6"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin6">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin6"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PRODUK 7 -->
+        <section class="product-box">
+            <div class="product-title">PRODUK 7</div>
+
+            <div class="input-row">
+
+                <div class="barcode-area">
+                    <label for="barcode7">Barcode</label>
+
+                    <div class="barcode-search">
+                        <input
+                            type="text"
+                            id="barcode7"
+                            placeholder="Scan / Ketik Barcode"
+                            autocomplete="off"
+                            inputmode="numeric"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="searchProduct(7)"
+                        >SEARCH</button>
+                    </div>
+
+                    <div id="productName7" class="product-name"></div>
+                </div>
+
+                <div class="expired-area">
+                    <label for="expired7">Expired</label>
+
+                    <input
+                        type="text"
+                        id="expired7"
+                        placeholder="DDMMYY"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+
+                    <small>Format: DDMMYY</small>
+                </div>
+
+            </div>
+
+            <div class="nie-area">
+                <label for="izin7">Nomor Izin Edar</label>
+
+                <input
+                    type="text"
+                    id="izin7"
+                    placeholder="Masukkan Nomor Izin Edar"
+                    autocomplete="off"
+                >
+            </div>
+        </section>
+
+
+        <!-- PESAN -->
+        <div
+            id="message"
+            class="message"
+            role="alert"
+        ></div>
+
+
+        <!-- TOMBOL SIMPAN -->
+        <button
+            type="button"
+            id="saveButton"
+            onclick="saveAllProducts()"
+        >
+            SIMPAN SEMUA
+        </button>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+        CEK PRODUK EXPIRED
+    </footer>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
