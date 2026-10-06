@@ -144,7 +144,8 @@ document.addEventListener(
 
 // ==================================================
 // SIMPAN SEMUA PRODUK
-// Dengan validasi sebelum dikirim ke server
+// Barcode & Expired wajib
+// NIE boleh kosong
 // ==================================================
 
 function saveAllProducts() {
@@ -204,7 +205,7 @@ function saveAllProducts() {
 
 
         // ==================================================
-        // CEK DATA LENGKAP
+        // BARCODE WAJIB
         // ==================================================
 
         if (!barcode) {
@@ -217,33 +218,30 @@ function saveAllProducts() {
 
         }
 
+
+        // ==================================================
+        // EXPIRED WAJIB
+        // ==================================================
+
         if (!expired) {
 
             errors.push(
                 'Produk ' +
                 i +
-                ': Expired belum diisi'
-            );
-
-        }
-
-        if (!izinEdar) {
-
-            errors.push(
-                'Produk ' +
-                i +
-                ': Nomor Izin Edar belum diisi'
+                ': Expired wajib diisi'
             );
 
         }
 
 
-        // Kalau ada yang kosong,
-        // jangan lanjut validasi expired
+        // ==================================================
+        // JIKA BARCODE / EXPIRED KOSONG
+        // JANGAN LANJUT KE VALIDASI TANGGAL
+        // ==================================================
+
         if (
             !barcode ||
-            !expired ||
-            !izinEdar
+            !expired
         ) {
 
             continue;
@@ -253,6 +251,7 @@ function saveAllProducts() {
 
         // ==================================================
         // VALIDASI FORMAT EXPIRED
+        // Harus 6 angka DDMMYY
         // ==================================================
 
         if (!/^\d{6}$/.test(expired)) {
@@ -290,6 +289,7 @@ function saveAllProducts() {
         const fullYear =
             2000 + year;
 
+
         const date =
             new Date(
                 fullYear,
@@ -316,7 +316,8 @@ function saveAllProducts() {
 
 
         // ==================================================
-        // MASUKKAN PRODUK YANG VALID
+        // PRODUK VALID
+        // NIE BOLEH KOSONG
         // ==================================================
 
         products.push({
@@ -336,7 +337,7 @@ function saveAllProducts() {
 
 
     // ==================================================
-    // TAMPILKAN ERROR
+    // ELEMENT PESAN & TOMBOL
     // ==================================================
 
     const message =
@@ -349,6 +350,11 @@ function saveAllProducts() {
             'saveButton'
         );
 
+
+    // ==================================================
+    // JIKA ADA ERROR
+    // JANGAN SIMPAN
+    // ==================================================
 
     if (errors.length > 0) {
 
