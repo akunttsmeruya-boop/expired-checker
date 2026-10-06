@@ -7,17 +7,25 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbylGdvfr812eNhNlBQJMxuX
 
 async function searchProduct(nomor) {
 
-    const barcodeInput = document.getElementById('barcode' + nomor);
-    const nameElement = document.getElementById('productName' + nomor);
+    const barcodeInput =
+        document.getElementById('barcode' + nomor);
 
-    const barcode = barcodeInput.value.trim();
+    const nameElement =
+        document.getElementById('productName' + nomor);
+
+    const barcode =
+        barcodeInput.value.trim();
 
     if (!barcode) {
-        nameElement.textContent = 'Masukkan barcode terlebih dahulu';
+
+        nameElement.textContent =
+            'Masukkan barcode terlebih dahulu';
+
         return;
     }
 
-    nameElement.textContent = 'Mencari produk...';
+    nameElement.textContent =
+        'Mencari produk...';
 
     try {
 
@@ -26,27 +34,46 @@ async function searchProduct(nomor) {
             '?action=search&barcode=' +
             encodeURIComponent(barcode);
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            redirect: 'follow'
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                'HTTP ' + response.status
+            );
+        }
+
         const data = await response.json();
+
+        console.log('HASIL API:', data);
 
         if (data.success && data.found) {
 
-            nameElement.textContent = data.prod_nm || 'Produk ditemukan';
+            barcodeInput.value =
+                data.barcode;
 
-            barcodeInput.value = data.barcode || barcode;
+            nameElement.textContent =
+                data.prod_nm;
 
         } else {
 
-            nameElement.textContent = 'BARCODE TIDAK DITEMUKAN';
+            nameElement.textContent =
+                'BARCODE TIDAK DITEMUKAN';
 
         }
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            'ERROR SEARCH:',
+            error
+        );
 
-        nameElement.textContent = 'Gagal terhubung ke server';
-
+        nameElement.textContent =
+            'Gagal terhubung ke server';
     }
 }
 
