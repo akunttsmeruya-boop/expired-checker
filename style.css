@@ -378,3 +378,52 @@ footer {
         font-size: 13px;
     }
 }
+
+/* ==================================================
+   AUTOCOMPLETE BARCODE
+   ================================================== */
+
+.barcode-wrapper {
+    position: relative;
+}
+
+.barcode-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 9999;
+    display: none;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.barcode-suggestion-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.barcode-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.barcode-suggestion-item:hover {
+    background: #f0f7ff;
+}
+
+.suggestion-barcode {
+    font-weight: bold;
+    color: #1976D2;
+    font-size: 16px;
+}
+
+.suggestion-name {
+    color: #555;
+    font-size: 13px;
+    margin-top: 3px;
+}
