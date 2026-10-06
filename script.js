@@ -882,6 +882,41 @@ function clearForm() {
 // ==================================================
 
 let activeScanner = null;
+let activeScannerNumber = null;
+
+
+// ==================================================
+// BUKA / TUTUP SCANNER
+// ==================================================
+
+function toggleScanner(nomor) {
+
+    // Jika scanner sedang aktif
+    if (
+        activeScanner &&
+        activeScannerNumber === nomor
+    ) {
+
+        stopScanner(nomor);
+
+        return;
+    }
+
+
+    // Jika scanner lain sedang aktif,
+    // tutup terlebih dahulu
+    if (activeScanner) {
+
+        stopScanner(
+            activeScannerNumber
+        );
+
+    }
+
+
+    startScanner(nomor);
+
+}
 
 
 // ==================================================
@@ -890,25 +925,14 @@ let activeScanner = null;
 
 function startScanner(nomor) {
 
-    // Jika scanner lain sedang aktif
-    if (activeScanner) {
-
-        try {
-            activeScanner.stop();
-        } catch (e) {}
-
-        activeScanner = null;
-    }
-
-
     const scannerElement =
         document.getElementById(
             'scanner' + nomor
         );
 
-    const barcodeInput =
+    const scanButton =
         document.getElementById(
-            'barcode' + nomor
+            'scanButton' + nomor
         );
 
 
@@ -916,6 +940,10 @@ function startScanner(nomor) {
 
     scannerElement.style.display =
         'block';
+
+
+    scanButton.textContent =
+        'TUTUP';
 
 
     const scanner =
@@ -927,10 +955,9 @@ function startScanner(nomor) {
     activeScanner =
         scanner;
 
+    activeScannerNumber =
+        nomor;
 
-    // ==================================================
-    // KONFIGURASI KAMERA
-    // ==================================================
 
     const config = {
 
@@ -949,16 +976,24 @@ function startScanner(nomor) {
 
 
     // ==================================================
-    // MULAI KAMERA
+    // CARI KAMERA BELAKANG
     // ==================================================
 
     Html5Qrcode.getCameras()
+
         .then(function(cameras) {
 
-            if (!cameras || cameras.length === 0) {
+            if (
+                !cameras ||
+                cameras.length === 0
+            ) {
 
                 alert(
                     'Kamera tidak ditemukan'
+                );
+
+                resetScannerButton(
+                    nomor
                 );
 
                 return;
@@ -966,11 +1001,11 @@ function startScanner(nomor) {
             }
 
 
-            // Cari kamera belakang
             let cameraId =
                 cameras[0].id;
 
 
+            // Prioritas kamera belakang
             for (
                 let i = 0;
                 i < cameras.length;
@@ -978,8 +1013,9 @@ function startScanner(nomor) {
             ) {
 
                 const label =
-                    cameras[i].label
-                        .toLowerCase();
+                    String(
+                        cameras[i].label || ''
+                    ).toLowerCase();
 
 
                 if (
@@ -998,7 +1034,11 @@ function startScanner(nomor) {
             }
 
 
-            scanner.start(
+            // ==================================================
+            // START CAMERA
+            // ==================================================
+
+            return scanner.start(
 
                 cameraId,
 
@@ -1006,9 +1046,13 @@ function startScanner(nomor) {
 
                 function(decodedText) {
 
-                    // ==================================
-                    // BARCODE BERHASIL DIBACA
-                    // ==================================
+                    // Barcode berhasil dibaca
+
+                    const barcodeInput =
+                        document.getElementById(
+                            'barcode' + nomor
+                        );
+
 
                     barcodeInput.value =
                         decodedText;
@@ -1018,13 +1062,13 @@ function startScanner(nomor) {
                     beep();
 
 
-                    // Hentikan scanner
+                    // Tutup kamera
                     stopScanner(
                         nomor
                     );
 
 
-                    // Cari nama produk
+                    // Cari produk
                     searchProduct(
                         nomor
                     );
@@ -1033,23 +1077,30 @@ function startScanner(nomor) {
 
                 function(errorMessage) {
 
-                    // Tidak perlu melakukan apa-apa
-                    // selama kamera sedang scanning
+                    // Abaikan error scanning
+                    // selama proses scanning
 
                 }
 
             );
 
         })
+
         .catch(function(error) {
 
             console.error(
-                'Camera error:',
+                'Scanner error:',
                 error
             );
 
+
             alert(
                 'Tidak dapat mengakses kamera'
+            );
+
+
+            resetScannerButton(
+                nomor
             );
 
         });
@@ -1058,10 +1109,14 @@ function startScanner(nomor) {
 
 
 // ==================================================
-// STOP SCANNER
+// TUTUP SCANNER
 // ==================================================
 
 function stopScanner(nomor) {
+
+    const scanner =
+        activeScanner;
+
 
     const scannerElement =
         document.getElementById(
@@ -1069,32 +1124,86 @@ function stopScanner(nomor) {
         );
 
 
-    if (activeScanner) {
+    if (!scanner) {
 
-        activeScanner
-            .stop()
-            .then(function() {
+        resetScannerButton(
+            nomor
+        );
 
-                activeScanner = null;
+        return;
 
-                scannerElement.innerHTML =
-                    '';
+    }
 
-                scannerElement.style.display =
-                    'none';
 
-            })
-            .catch(function() {
+    scanner.stop()
 
-                activeScanner = null;
+        .then(function() {
 
-                scannerElement.innerHTML =
-                    '';
+            activeScanner = null;
 
-                scannerElement.style.display =
-                    'none';
+            activeScannerNumber =
+                null;
 
-            });
+
+            scannerElement.innerHTML =
+                '';
+
+            scannerElement.style.display =
+                'none';
+
+
+            resetScannerButton(
+                nomor
+            );
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                'Scanner stop:',
+                error
+            );
+
+
+            activeScanner = null;
+
+            activeScannerNumber =
+                null;
+
+
+            scannerElement.innerHTML =
+                '';
+
+            scannerElement.style.display =
+                'none';
+
+
+            resetScannerButton(
+                nomor
+            );
+
+        });
+
+}
+
+
+// ==================================================
+// RESET TOMBOL
+// ==================================================
+
+function resetScannerButton(nomor) {
+
+    const scanButton =
+        document.getElementById(
+            'scanButton' + nomor
+        );
+
+
+    if (scanButton) {
+
+        scanButton.textContent =
+            'SCAN';
 
     }
 
