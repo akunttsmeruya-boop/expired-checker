@@ -108,10 +108,45 @@ function searchProduct(nomor) {
 
 // ==================================================
 // AUTOCOMPLETE BARCODE
-// Mencari barcode yang mengandung angka yang diketik
 // ==================================================
 
-let suggestTimer = null;
+let suggestTimers = {};
+
+
+// ==================================================
+// BUAT DROPDOWN OTOMATIS
+// ==================================================
+
+function getSuggestionBox(nomor) {
+
+    const barcodeArea =
+        document.querySelector(
+            '#barcode' + nomor
+        ).closest('.barcode-area');
+
+    let dropdown =
+        document.getElementById(
+            'barcodeSuggestions' + nomor
+        );
+
+    if (!dropdown) {
+
+        dropdown =
+            document.createElement('div');
+
+        dropdown.id =
+            'barcodeSuggestions' + nomor;
+
+        dropdown.className =
+            'barcode-suggestions';
+
+        barcodeArea.appendChild(
+            dropdown
+        );
+    }
+
+    return dropdown;
+}
 
 
 // ==================================================
@@ -125,17 +160,19 @@ function suggestBarcode(nomor) {
             'barcode' + nomor
         );
 
+    const nameElement =
+        document.getElementById(
+            'productName' + nomor
+        );
+
+    const dropdown =
+        getSuggestionBox(nomor);
+
     const barcode =
         barcodeInput.value.trim();
 
 
-    // Ambil dropdown
-    const dropdown =
-        document.getElementById(
-            'barcodeSuggestions' + nomor
-        );
-
-
+    // Kosong
     if (!barcode) {
 
         dropdown.innerHTML = '';
@@ -155,176 +192,180 @@ function suggestBarcode(nomor) {
     }
 
 
-    // Hapus timer sebelumnya
-    clearTimeout(suggestTimer);
+    // Batalkan timer sebelumnya
+    clearTimeout(
+        suggestTimers[nomor]
+    );
 
 
-    // Tunggu sebentar supaya tidak request
-    // setiap karakter terlalu cepat
-    suggestTimer = setTimeout(function() {
+    // Tunggu 300 ms
+    suggestTimers[nomor] =
+        setTimeout(function() {
 
-        const callbackName =
-            'suggestCallback_' +
-            nomor +
-            '_' +
-            Date.now();
+            const callbackName =
+                'suggestCallback_' +
+                nomor +
+                '_' +
+                Date.now();
 
 
-        window[callbackName] =
-            function(data) {
+            window[callbackName] =
+                function(data) {
 
-                if (
-                    data.success &&
-                    data.suggestions &&
-                    data.suggestions.length > 0
-                ) {
+                    // ==========================================
+                    // BERSIHKAN DROPDOWN
+                    // ==========================================
 
                     dropdown.innerHTML = '';
 
-                    data.suggestions.forEach(
-                        function(item) {
 
-                            const div =
-                                document.createElement(
-                                    'div'
+                    if (
+                        data.success &&
+                        data.suggestions &&
+                        data.suggestions.length > 0
+                    ) {
+
+                        data.suggestions.forEach(
+                            function(item) {
+
+                                const div =
+                                    document.createElement(
+                                        'div'
+                                    );
+
+                                div.className =
+                                    'barcode-suggestion-item';
+
+
+                                div.innerHTML =
+                                    '<div class="suggestion-barcode">' +
+                                    item.barcode +
+                                    '</div>' +
+
+                                    '<div class="suggestion-name">' +
+                                    item.prod_nm +
+                                    '</div>';
+
+
+                                // ==================================
+                                // KLIK PILIHAN
+                                // ==================================
+
+                                div.addEventListener(
+                                    'mousedown',
+                                    function(event) {
+
+                                        event.preventDefault();
+
+
+                                        barcodeInput.value =
+                                            item.barcode;
+
+
+                                        nameElement.textContent =
+                                            item.prod_nm;
+
+
+                                        dropdown.innerHTML =
+                                            '';
+
+                                        dropdown.style.display =
+                                            'none';
+
+                                    }
                                 );
 
-                            div.className =
-                                'barcode-suggestion-item';
+
+                                dropdown.appendChild(
+                                    div
+                                );
+
+                            }
+                        );
 
 
-                            div.innerHTML =
-                                '<div class="suggestion-barcode">' +
-                                item.barcode +
-                                '</div>' +
+                        dropdown.style.display =
+                            'block';
 
-                                '<div class="suggestion-name">' +
-                                item.prod_nm +
-                                '</div>';
+                    } else {
 
+                        dropdown.style.display =
+                            'none';
 
-                            // ==================================
-                            // KLIK PILIHAN
-                            // ==================================
-
-                            div.addEventListener(
-                                'mousedown',
-                                function(event) {
-
-                                    event.preventDefault();
-
-                                    barcodeInput.value =
-                                        item.barcode;
+                    }
 
 
-                                    const nameElement =
-                                        document.getElementById(
-                                            'productName' + nomor
-                                        );
+                    delete window[callbackName];
 
 
-                                    nameElement.textContent =
-                                        item.prod_nm;
+                    if (script.parentNode) {
+
+                        script.parentNode.removeChild(
+                            script
+                        );
+
+                    }
+
+                };
 
 
-                                    dropdown.innerHTML =
-                                        '';
+            // ==========================================
+            // REQUEST JSONP
+            // ==========================================
 
-                                    dropdown.style.display =
-                                        'none';
-
-                                }
-                            );
+            const script =
+                document.createElement('script');
 
 
-                            dropdown.appendChild(
-                                div
-                            );
+            script.src =
+                API_URL +
+                '?action=suggest' +
+                '&barcode=' +
+                encodeURIComponent(barcode) +
+                '&callback=' +
+                encodeURIComponent(
+                    callbackName
+                );
 
-                        }
-                    );
 
-
-                    dropdown.style.display =
-                        'block';
-
-                } else {
+            script.onerror =
+                function() {
 
                     dropdown.innerHTML =
                         '<div class="barcode-suggestion-item">' +
-                        'Barcode tidak ditemukan' +
+                        'Gagal terhubung ke server' +
                         '</div>';
 
                     dropdown.style.display =
                         'block';
 
-                }
+
+                    delete window[callbackName];
 
 
-                delete window[callbackName];
+                    if (script.parentNode) {
 
-                if (script.parentNode) {
-                    script.parentNode.removeChild(
-                        script
-                    );
-                }
+                        script.parentNode.removeChild(
+                            script
+                        );
 
-            };
+                    }
 
-
-        // ==========================================
-        // REQUEST JSONP
-        // ==========================================
-
-        const script =
-            document.createElement('script');
+                };
 
 
-        script.src =
-            API_URL +
-            '?action=suggest' +
-            '&barcode=' +
-            encodeURIComponent(barcode) +
-            '&callback=' +
-            encodeURIComponent(
-                callbackName
+            document.body.appendChild(
+                script
             );
 
 
-        script.onerror =
-            function() {
-
-                dropdown.innerHTML =
-                    '<div class="barcode-suggestion-item">' +
-                    'Gagal terhubung ke server' +
-                    '</div>';
-
-                dropdown.style.display =
-                    'block';
-
-
-                delete window[callbackName];
-
-                if (script.parentNode) {
-                    script.parentNode.removeChild(
-                        script
-                    );
-                }
-
-            };
-
-
-        document.body.appendChild(
-            script
-        );
-
-    }, 250);
+        }, 300);
 
 }
 
 
 // ==================================================
-// EVENT INPUT BARCODE
+// SAAT USER MENGETIK BARCODE
 // ==================================================
 
 document.addEventListener(
@@ -337,18 +378,20 @@ document.addEventListener(
 
         if (
             target.tagName === 'INPUT' &&
-            target.id.startsWith('barcode')
+            /^barcode[1-7]$/.test(target.id)
         ) {
 
             const nomor =
-                target.id.replace(
-                    'barcode',
-                    ''
+                Number(
+                    target.id.replace(
+                        'barcode',
+                        ''
+                    )
                 );
 
 
             suggestBarcode(
-                Number(nomor)
+                nomor
             );
 
         }
@@ -366,7 +409,9 @@ document.addEventListener(
     function(event) {
 
         if (
-            !event.target.id.startsWith('barcode')
+            !event.target.closest(
+                '.barcode-area'
+            )
         ) {
 
             document
