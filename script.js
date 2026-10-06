@@ -877,3 +877,290 @@ function clearForm() {
     }
 
 }
+// ==================================================
+// BARCODE SCANNER
+// ==================================================
+
+let activeScanner = null;
+
+
+// ==================================================
+// MULAI SCANNER
+// ==================================================
+
+function startScanner(nomor) {
+
+    // Jika scanner lain sedang aktif
+    if (activeScanner) {
+
+        try {
+            activeScanner.stop();
+        } catch (e) {}
+
+        activeScanner = null;
+    }
+
+
+    const scannerElement =
+        document.getElementById(
+            'scanner' + nomor
+        );
+
+    const barcodeInput =
+        document.getElementById(
+            'barcode' + nomor
+        );
+
+
+    scannerElement.innerHTML = '';
+
+    scannerElement.style.display =
+        'block';
+
+
+    const scanner =
+        new Html5Qrcode(
+            'scanner' + nomor
+        );
+
+
+    activeScanner =
+        scanner;
+
+
+    // ==================================================
+    // KONFIGURASI KAMERA
+    // ==================================================
+
+    const config = {
+
+        fps: 10,
+
+        qrbox: {
+            width: 250,
+            height: 120
+        },
+
+        formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13
+        ]
+
+    };
+
+
+    // ==================================================
+    // MULAI KAMERA
+    // ==================================================
+
+    Html5Qrcode.getCameras()
+        .then(function(cameras) {
+
+            if (!cameras || cameras.length === 0) {
+
+                alert(
+                    'Kamera tidak ditemukan'
+                );
+
+                return;
+
+            }
+
+
+            // Cari kamera belakang
+            let cameraId =
+                cameras[0].id;
+
+
+            for (
+                let i = 0;
+                i < cameras.length;
+                i++
+            ) {
+
+                const label =
+                    cameras[i].label
+                        .toLowerCase();
+
+
+                if (
+                    label.includes('back') ||
+                    label.includes('rear') ||
+                    label.includes('environment')
+                ) {
+
+                    cameraId =
+                        cameras[i].id;
+
+                    break;
+
+                }
+
+            }
+
+
+            scanner.start(
+
+                cameraId,
+
+                config,
+
+                function(decodedText) {
+
+                    // ==================================
+                    // BARCODE BERHASIL DIBACA
+                    // ==================================
+
+                    barcodeInput.value =
+                        decodedText;
+
+
+                    // Beep
+                    beep();
+
+
+                    // Hentikan scanner
+                    stopScanner(
+                        nomor
+                    );
+
+
+                    // Cari nama produk
+                    searchProduct(
+                        nomor
+                    );
+
+                },
+
+                function(errorMessage) {
+
+                    // Tidak perlu melakukan apa-apa
+                    // selama kamera sedang scanning
+
+                }
+
+            );
+
+        })
+        .catch(function(error) {
+
+            console.error(
+                'Camera error:',
+                error
+            );
+
+            alert(
+                'Tidak dapat mengakses kamera'
+            );
+
+        });
+
+}
+
+
+// ==================================================
+// STOP SCANNER
+// ==================================================
+
+function stopScanner(nomor) {
+
+    const scannerElement =
+        document.getElementById(
+            'scanner' + nomor
+        );
+
+
+    if (activeScanner) {
+
+        activeScanner
+            .stop()
+            .then(function() {
+
+                activeScanner = null;
+
+                scannerElement.innerHTML =
+                    '';
+
+                scannerElement.style.display =
+                    'none';
+
+            })
+            .catch(function() {
+
+                activeScanner = null;
+
+                scannerElement.innerHTML =
+                    '';
+
+                scannerElement.style.display =
+                    'none';
+
+            });
+
+    }
+
+}
+
+
+// ==================================================
+// BEEP
+// ==================================================
+
+function beep() {
+
+    try {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+
+        const audioContext =
+            new AudioContext();
+
+
+        const oscillator =
+            audioContext.createOscillator();
+
+
+        const gainNode =
+            audioContext.createGain();
+
+
+        oscillator.connect(
+            gainNode
+        );
+
+        gainNode.connect(
+            audioContext.destination
+        );
+
+
+        oscillator.frequency.value =
+            1000;
+
+        oscillator.type =
+            'sine';
+
+
+        gainNode.gain.setValueAtTime(
+            0.3,
+            audioContext.currentTime
+        );
+
+
+        oscillator.start();
+
+
+        oscillator.stop(
+            audioContext.currentTime + 0.15
+        );
+
+    } catch (error) {
+
+        console.log(
+            'Beep tidak tersedia'
+        );
+
+    }
+
+}
