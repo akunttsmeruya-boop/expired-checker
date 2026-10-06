@@ -142,54 +142,202 @@ document.addEventListener(
     }
 );
 
-
 // ==================================================
 // SIMPAN SEMUA PRODUK
-// Menggunakan JSONP agar tidak terkena CORS
+// Dengan validasi sebelum dikirim ke server
 // ==================================================
 
 function saveAllProducts() {
 
     const products = [];
+    const errors = [];
 
 
-    // Ambil data Produk 1 sampai 7
+    // ==================================================
+    // CEK PRODUK 1 - 7
+    // ==================================================
+
     for (
         let i = 1;
         i <= 7;
         i++
     ) {
 
+        const barcode =
+            document
+                .getElementById(
+                    'barcode' + i
+                )
+                .value
+                .trim();
+
+        const expired =
+            document
+                .getElementById(
+                    'expired' + i
+                )
+                .value
+                .trim();
+
+        const izinEdar =
+            document
+                .getElementById(
+                    'izin' + i
+                )
+                .value
+                .trim();
+
+
+        // ==================================================
+        // PRODUK BENAR-BENAR KOSONG
+        // ==================================================
+
+        if (
+            !barcode &&
+            !expired &&
+            !izinEdar
+        ) {
+
+            continue;
+
+        }
+
+
+        // ==================================================
+        // CEK DATA LENGKAP
+        // ==================================================
+
+        if (!barcode) {
+
+            errors.push(
+                'Produk ' +
+                i +
+                ': Barcode belum diisi'
+            );
+
+        }
+
+        if (!expired) {
+
+            errors.push(
+                'Produk ' +
+                i +
+                ': Expired belum diisi'
+            );
+
+        }
+
+        if (!izinEdar) {
+
+            errors.push(
+                'Produk ' +
+                i +
+                ': Nomor Izin Edar belum diisi'
+            );
+
+        }
+
+
+        // Kalau ada yang kosong,
+        // jangan lanjut validasi expired
+        if (
+            !barcode ||
+            !expired ||
+            !izinEdar
+        ) {
+
+            continue;
+
+        }
+
+
+        // ==================================================
+        // VALIDASI FORMAT EXPIRED
+        // ==================================================
+
+        if (!/^\d{6}$/.test(expired)) {
+
+            errors.push(
+                'Produk ' +
+                i +
+                ': Expired harus format DDMMYY'
+            );
+
+            continue;
+
+        }
+
+
+        // ==================================================
+        // VALIDASI TANGGAL
+        // ==================================================
+
+        const day =
+            Number(
+                expired.substring(0, 2)
+            );
+
+        const month =
+            Number(
+                expired.substring(2, 4)
+            );
+
+        const year =
+            Number(
+                expired.substring(4, 6)
+            );
+
+        const fullYear =
+            2000 + year;
+
+        const date =
+            new Date(
+                fullYear,
+                month - 1,
+                day
+            );
+
+
+        if (
+            date.getFullYear() !== fullYear ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day
+        ) {
+
+            errors.push(
+                'Produk ' +
+                i +
+                ': Tanggal Expired tidak valid'
+            );
+
+            continue;
+
+        }
+
+
+        // ==================================================
+        // MASUKKAN PRODUK YANG VALID
+        // ==================================================
+
         products.push({
 
             barcode:
-                document
-                    .getElementById(
-                        'barcode' + i
-                    )
-                    .value
-                    .trim(),
+                barcode,
 
             expired:
-                document
-                    .getElementById(
-                        'expired' + i
-                    )
-                    .value
-                    .trim(),
+                expired,
 
             izin_edar:
-                document
-                    .getElementById(
-                        'izin' + i
-                    )
-                    .value
-                    .trim()
+                izinEdar
 
         });
 
     }
 
+
+    // ==================================================
+    // TAMPILKAN ERROR
+    // ==================================================
 
     const message =
         document.getElementById(
@@ -202,7 +350,40 @@ function saveAllProducts() {
         );
 
 
-    // Tombol dikunci sementara
+    if (errors.length > 0) {
+
+        message.className =
+            'message error';
+
+        message.textContent =
+            errors.join(' | ');
+
+        return;
+
+    }
+
+
+    // ==================================================
+    // TIDAK ADA PRODUK
+    // ==================================================
+
+    if (products.length === 0) {
+
+        message.className =
+            'message error';
+
+        message.textContent =
+            'Tidak ada produk yang diisi';
+
+        return;
+
+    }
+
+
+    // ==================================================
+    // MULAI SIMPAN
+    // ==================================================
+
     saveButton.disabled = true;
 
     saveButton.textContent =
@@ -225,7 +406,7 @@ function saveAllProducts() {
 
 
     // ==================================================
-    // FUNGSI CALLBACK
+    // CALLBACK JSONP
     // ==================================================
 
     window[callbackName] = function(data) {
@@ -251,17 +432,14 @@ function saveAllProducts() {
         }
 
 
-        // Hapus callback
         delete window[callbackName];
 
 
-        // Hapus script
         if (script.parentNode) {
             script.parentNode.removeChild(script);
         }
 
 
-        // Aktifkan kembali tombol
         saveButton.disabled = false;
 
         saveButton.textContent =
@@ -271,7 +449,7 @@ function saveAllProducts() {
 
 
     // ==================================================
-    // BUAT REQUEST JSONP
+    // REQUEST JSONP
     // ==================================================
 
     const script =
@@ -292,7 +470,7 @@ function saveAllProducts() {
 
 
     // ==================================================
-    // JIKA GAGAL TERHUBUNG
+    // ERROR CONNECTION
     // ==================================================
 
     script.onerror = function() {
