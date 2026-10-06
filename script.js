@@ -145,13 +145,15 @@ document.addEventListener(
 
 // ==================================================
 // SIMPAN SEMUA PRODUK
+// Menggunakan JSONP agar tidak terkena CORS
 // ==================================================
 
-async function saveAllProducts() {
+function saveAllProducts() {
 
     const products = [];
 
 
+    // Ambil data Produk 1 sampai 7
     for (
         let i = 1;
         i <= 7;
@@ -200,6 +202,7 @@ async function saveAllProducts() {
         );
 
 
+    // Tombol dikunci sementara
     saveButton.disabled = true;
 
     saveButton.textContent =
@@ -212,33 +215,20 @@ async function saveAllProducts() {
         '';
 
 
-    try {
+    // ==================================================
+    // CALLBACK UNIK
+    // ==================================================
 
-        const url =
-            API_URL +
-            '?action=save&products=' +
-            encodeURIComponent(
-                JSON.stringify(products)
-            );
-
-
-        const response =
-            await fetch(url);
+    const callbackName =
+        'saveCallback_' +
+        Date.now();
 
 
-        if (!response.ok) {
+    // ==================================================
+    // FUNGSI CALLBACK
+    // ==================================================
 
-            throw new Error(
-                'HTTP ' +
-                response.status
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
+    window[callbackName] = function(data) {
 
         if (data.success) {
 
@@ -261,11 +251,54 @@ async function saveAllProducts() {
         }
 
 
-    } catch (error) {
+        // Hapus callback
+        delete window[callbackName];
+
+
+        // Hapus script
+        if (script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+
+
+        // Aktifkan kembali tombol
+        saveButton.disabled = false;
+
+        saveButton.textContent =
+            'SIMPAN SEMUA';
+
+    };
+
+
+    // ==================================================
+    // BUAT REQUEST JSONP
+    // ==================================================
+
+    const script =
+        document.createElement('script');
+
+
+    script.src =
+        API_URL +
+        '?action=save' +
+        '&products=' +
+        encodeURIComponent(
+            JSON.stringify(products)
+        ) +
+        '&callback=' +
+        encodeURIComponent(
+            callbackName
+        );
+
+
+    // ==================================================
+    // JIKA GAGAL TERHUBUNG
+    // ==================================================
+
+    script.onerror = function() {
 
         console.error(
-            'ERROR SAVE:',
-            error
+            'ERROR SAVE: Gagal terhubung ke server'
         );
 
         message.className =
@@ -274,15 +307,27 @@ async function saveAllProducts() {
         message.textContent =
             'Gagal terhubung ke server';
 
-    }
+
+        delete window[callbackName];
 
 
-    saveButton.disabled = false;
+        if (script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
 
-    saveButton.textContent =
-        'SIMPAN SEMUA';
+
+        saveButton.disabled = false;
+
+        saveButton.textContent =
+            'SIMPAN SEMUA';
+
+    };
+
+
+    // Jalankan request
+    document.body.appendChild(script);
+
 }
-
 
 // ==================================================
 // BERSIHKAN FORM
