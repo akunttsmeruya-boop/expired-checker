@@ -359,7 +359,7 @@ function suggestBarcode(nomor) {
             );
 
 
-        }, 300);
+        }, 150);
 
 }
 
