@@ -107,8 +107,8 @@ header p {
    ================================================== */
 
 .product-box {
-    margin-bottom: 10px;
-    padding: 12px;
+    margin-bottom: 8px;
+    padding: 10px;
     background: #ffffff;
     border: 1px solid #d7dce2;
     border-radius: 8px;
@@ -116,100 +116,30 @@ header p {
 
 
 /* ==================================================
-   BARCODE + EXPIRED
+   BARCODE
    ================================================== */
 
-.input-row {
+.barcode-row {
     display: flex;
-    gap: 10px;
-    width: 100%;
     align-items: flex-start;
-}
-
-.barcode-area {
-    position: relative;
-    flex: 1;
-    min-width: 0;
-}
-
-.expired-area {
-    width: 180px;
-    flex-shrink: 0;
-}
-
-
-/* ==================================================
-   NOMOR PRODUK + LABEL BARCODE
-   ================================================== */
-
-.barcode-label-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 6px;
+    width: 100%;
 }
 
 .product-number {
-    width: 24px;
-    min-width: 24px;
+    width: 22px;
+    min-width: 22px;
+    padding-top: 10px;
     color: #1976d2;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
 }
 
-.barcode-label-row label {
-    margin: 0;
-}
-
-
-/* ==================================================
-   NIE
-   ================================================== */
-
-.nie-area {
-    width: 100%;
-    margin-top: 10px;
-}
-
-
-/* ==================================================
-   LABEL
-   ================================================== */
-
-label {
-    display: block;
-    margin-bottom: 4px;
-    color: #444;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-
-/* ==================================================
-   INPUT
-   ================================================== */
-
-input {
-    width: 100%;
-    height: 42px;
-    padding: 8px 10px;
-    border: 1px solid #bfc6ce;
-    border-radius: 6px;
-    outline: none;
-    background: #ffffff;
-    color: #222;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
-}
-
-input:focus {
-    border-color: #1976d2;
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.08);
-}
-
-input::placeholder {
-    color: #999;
+.barcode-area {
+    position: relative;
+    flex: 1;
+    min-width: 0;
 }
 
 
@@ -264,14 +194,93 @@ input::placeholder {
 
 
 /* ==================================================
-   EXPIRED HINT
+   EXPIRED
    ================================================== */
 
-.expired-area small {
+.expired-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.expired-row > label {
+    width: 70px;
+    min-width: 70px;
+    padding-top: 11px;
+    margin: 0;
+}
+
+.expired-row > div {
+    width: 180px;
+}
+
+.expired-row small {
     display: block;
-    margin-top: 3px;
+    margin-top: 2px;
     color: #777777;
-    font-size: 11px;
+    font-size: 10px;
+}
+
+
+/* ==================================================
+   NIE
+   ================================================== */
+
+.nie-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.nie-row label {
+    width: 105px;
+    min-width: 105px;
+    margin: 0;
+}
+
+.nie-row input {
+    flex: 1;
+}
+
+
+/* ==================================================
+   LABEL
+   ================================================== */
+
+label {
+    display: block;
+    color: #444;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+
+/* ==================================================
+   INPUT
+   ================================================== */
+
+input {
+    width: 100%;
+    height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #bfc6ce;
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    color: #222;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.08);
+}
+
+input::placeholder {
+    color: #999;
 }
 
 
@@ -281,9 +290,9 @@ input::placeholder {
 
 .barcode-suggestions {
     position: absolute;
-    left: 32px;
+    left: 0;
     right: 0;
-    top: 68px;
+    top: 48px;
     background: #ffffff;
     border: 1px solid #cccccc;
     border-radius: 6px;
@@ -366,7 +375,7 @@ input::placeholder {
     display: block;
     width: 100%;
     height: 50px;
-    margin-top: 15px;
+    margin-top: 12px;
     border: none;
     border-radius: 7px;
     background: #1976d2;
@@ -395,7 +404,7 @@ input::placeholder {
    ================================================== */
 
 footer {
-    margin-top: 20px;
+    margin-top: 15px;
     color: #888888;
     text-align: center;
     font-size: 11px;
@@ -409,14 +418,14 @@ footer {
 @media (max-width: 600px) {
 
     .container {
-        padding: 10px;
+        padding: 8px;
     }
 
 
     /* HEADER */
 
     header {
-        margin-bottom: 15px;
+        margin-bottom: 12px;
     }
 
     header h1 {
@@ -424,6 +433,7 @@ footer {
     }
 
     header p {
+        margin-top: 4px;
         font-size: 13px;
     }
 
@@ -431,57 +441,36 @@ footer {
     /* PRODUCT */
 
     .product-box {
-        margin-bottom: 8px;
-        padding: 9px;
+        margin-bottom: 7px;
+        padding: 8px;
         border-radius: 7px;
     }
 
 
-    /* BARCODE + EXPIRED */
+    /* BARCODE */
 
-    .input-row {
-        display: flex;
-        gap: 6px;
-        align-items: flex-start;
-    }
-
-    .barcode-area {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .expired-area {
-        width: 105px;
-        flex-shrink: 0;
-    }
-
-
-    /* NOMOR PRODUK */
-
-    .barcode-label-row {
+    .barcode-row {
         gap: 5px;
-        margin-bottom: 3px;
     }
 
     .product-number {
         width: 20px;
         min-width: 20px;
+        padding-top: 10px;
         font-size: 14px;
     }
 
 
-    /* NIE */
+    /* BARCODE SEARCH */
 
-    .nie-area {
-        margin-top: 7px;
+    .barcode-search {
+        gap: 4px;
     }
 
-
-    /* LABEL */
-
-    label {
-        margin-bottom: 3px;
-        font-size: 11px;
+    .barcode-search button {
+        width: 62px;
+        height: 40px;
+        font-size: 10px;
     }
 
 
@@ -492,19 +481,6 @@ footer {
         padding: 7px 8px;
         border-radius: 5px;
         font-size: 14px;
-    }
-
-
-    /* BARCODE */
-
-    .barcode-search {
-        gap: 4px;
-    }
-
-    .barcode-search button {
-        width: 62px;
-        height: 40px;
-        font-size: 10px;
     }
 
 
@@ -519,17 +495,47 @@ footer {
 
     /* EXPIRED */
 
-    .expired-area small {
-        margin-top: 2px;
+    .expired-row {
+        gap: 6px;
+        margin-top: 3px;
+    }
+
+    .expired-row > label {
+        width: 58px;
+        min-width: 58px;
+        padding-top: 10px;
+        font-size: 11px;
+    }
+
+    .expired-row > div {
+        width: 110px;
+    }
+
+    .expired-row small {
+        margin-top: 1px;
         font-size: 9px;
+    }
+
+
+    /* NIE */
+
+    .nie-row {
+        gap: 6px;
+        margin-top: 3px;
+    }
+
+    .nie-row label {
+        width: 95px;
+        min-width: 95px;
+        font-size: 10px;
     }
 
 
     /* AUTOCOMPLETE */
 
     .barcode-suggestions {
-        left: 25px;
-        top: 62px;
+        top: 44px;
+        left: 0;
     }
 
     .barcode-suggestion-item {
@@ -549,7 +555,7 @@ footer {
 
     #saveButton {
         height: 48px;
-        margin-top: 12px;
+        margin-top: 10px;
         font-size: 16px;
     }
 
@@ -557,7 +563,7 @@ footer {
     /* FOOTER */
 
     footer {
-        margin-top: 15px;
+        margin-top: 12px;
     }
 
 
@@ -582,39 +588,61 @@ footer {
 @media (max-width: 380px) {
 
     .container {
-        padding: 7px;
+        padding: 6px;
     }
 
     .product-box {
-        padding: 8px;
+        padding: 7px;
     }
 
-    .input-row {
-        gap: 5px;
+
+    /* BARCODE */
+
+    .barcode-row {
+        gap: 4px;
     }
 
-    .expired-area {
-        width: 95px;
+    .product-number {
+        width: 18px;
+        min-width: 18px;
+        padding-top: 10px;
+        font-size: 13px;
     }
+
+
+    /* SCAN */
 
     .barcode-search button {
         width: 55px;
         font-size: 9px;
     }
 
+
+    /* INPUT */
+
     input {
         padding: 6px 7px;
         font-size: 13px;
     }
 
-    .product-number {
-        width: 18px;
-        min-width: 18px;
-        font-size: 13px;
+
+    /* EXPIRED */
+
+    .expired-row > label {
+        width: 55px;
+        min-width: 55px;
     }
 
-    .barcode-label-row {
-        gap: 4px;
+    .expired-row > div {
+        width: 100px;
+    }
+
+
+    /* NIE */
+
+    .nie-row label {
+        width: 90px;
+        min-width: 90px;
     }
 
 }
