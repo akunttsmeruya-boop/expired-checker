@@ -197,23 +197,21 @@ header p {
    ================================================== */
 
 .nie-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: block;
     width: calc(100% - 30px);
     margin-top: 4px;
     margin-left: 30px;
 }
 
 .nie-row label {
-    width: 105px;
-    min-width: 105px;
-    margin: 0;
+    display: block;
+    width: 100%;
+    margin: 0 0 4px 0;
 }
 
 .nie-row input {
-    flex: 1 1 auto;
-    min-width: 0;
+    display: block;
+    width: 100%;
 }
 
 
