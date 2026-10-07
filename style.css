@@ -507,10 +507,14 @@ footer {
     }
 
     .nie-row label {
-        width: 95px;
-        min-width: 95px;
+        display: block;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 3px;
         font-size: 12px;
-    }
+        font-weight: bold;
+        white-space: nowrap;
+    }        
 
 
     /* AUTOCOMPLETE */
