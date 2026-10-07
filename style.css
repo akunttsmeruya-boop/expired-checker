@@ -72,15 +72,18 @@ header p {
 
 
 /* ==================================================
-   BARCODE
+   BARCODE + EXPIRED
    ================================================== */
 
-.barcode-row {
+.product-main-row {
     display: flex;
     align-items: flex-start;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
 }
+
+
+/* NOMOR PRODUK */
 
 .product-number {
     width: 22px;
@@ -91,6 +94,11 @@ header p {
     font-weight: bold;
     text-align: center;
 }
+
+
+/* ==================================================
+   BARCODE AREA
+   ================================================== */
 
 .barcode-area {
     position: relative;
@@ -103,7 +111,6 @@ header p {
    BARCODE SEARCH
    ================================================== */
 
-/* 75% dari lebar area barcode */
 .barcode-search {
     display: flex;
     gap: 6px;
@@ -139,7 +146,7 @@ header p {
 
 
 /* ==================================================
-   PRODUCT NAME
+   PRODUCT NAME / HASIL LOAD
    ================================================== */
 
 .product-name {
@@ -151,28 +158,27 @@ header p {
 
 
 /* ==================================================
-   EXPIRED
+   EXPIRED - DI SAMPING BARCODE
    ================================================== */
 
-.expired-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 4px;
-}
-
-.expired-row > label {
-    width: 70px;
-    min-width: 70px;
-    padding-top: 8px;
-    margin: 0;
-}
-
-.expired-row > div {
+.expired-inline {
     width: 180px;
+    min-width: 180px;
 }
 
-.expired-row small {
+.expired-inline label {
+    display: block;
+    margin: 0 0 4px 0;
+    color: #444;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.expired-inline input {
+    width: 100%;
+}
+
+.expired-inline small {
     display: block;
     margin-top: 2px;
     color: #777777;
@@ -189,6 +195,7 @@ header p {
     align-items: center;
     gap: 8px;
     margin-top: 4px;
+    margin-left: 30px;
 }
 
 .nie-row label {
@@ -218,7 +225,6 @@ label {
    INPUT
    ================================================== */
 
-/* 80% dari tinggi sebelumnya: 42px → 34px */
 input {
     width: 100%;
     height: 34px;
@@ -405,11 +411,14 @@ footer {
     }
 
 
-    /* BARCODE */
+    /* MAIN ROW */
 
-    .barcode-row {
+    .product-main-row {
         gap: 5px;
     }
+
+
+    /* NOMOR PRODUK */
 
     .product-number {
         width: 20px;
@@ -419,7 +428,7 @@ footer {
     }
 
 
-    /* BARCODE SEARCH */
+    /* BARCODE */
 
     .barcode-search {
         gap: 4px;
@@ -435,7 +444,6 @@ footer {
 
     /* INPUT */
 
-    /* 80% dari tinggi sebelumnya: 40px → 32px */
     input {
         height: 32px;
         padding: 5px 8px;
@@ -455,23 +463,17 @@ footer {
 
     /* EXPIRED */
 
-    .expired-row {
-        gap: 6px;
-        margin-top: 3px;
+    .expired-inline {
+        width: 110px;
+        min-width: 110px;
     }
 
-    .expired-row > label {
-        width: 58px;
-        min-width: 58px;
-        padding-top: 7px;
+    .expired-inline label {
+        margin-bottom: 3px;
         font-size: 11px;
     }
 
-    .expired-row > div {
-        width: 110px;
-    }
-
-    .expired-row small {
+    .expired-inline small {
         margin-top: 1px;
         font-size: 9px;
     }
@@ -482,6 +484,7 @@ footer {
     .nie-row {
         gap: 6px;
         margin-top: 3px;
+        margin-left: 25px;
     }
 
     .nie-row label {
@@ -509,6 +512,13 @@ footer {
 
     .suggestion-name {
         font-size: 11px;
+    }
+
+
+    /* SCANNER */
+
+    .scanner-container {
+        margin-top: 6px;
     }
 
 
@@ -545,11 +555,14 @@ footer {
     }
 
 
-    /* BARCODE */
+    /* MAIN ROW */
 
-    .barcode-row {
+    .product-main-row {
         gap: 4px;
     }
+
+
+    /* NOMOR */
 
     .product-number {
         width: 18px;
@@ -559,7 +572,7 @@ footer {
     }
 
 
-    /* SCAN */
+    /* BARCODE */
 
     .barcode-search {
         width: 75%;
@@ -583,17 +596,21 @@ footer {
 
     /* EXPIRED */
 
-    .expired-row > label {
-        width: 55px;
-        min-width: 55px;
+    .expired-inline {
+        width: 95px;
+        min-width: 95px;
     }
 
-    .expired-row > div {
-        width: 100px;
+    .expired-inline label {
+        font-size: 10px;
     }
 
 
     /* NIE */
+
+    .nie-row {
+        margin-left: 22px;
+    }
 
     .nie-row label {
         width: 90px;
