@@ -107,50 +107,447 @@ function searchProduct(nomor) {
 }
 
 // ==================================================
-// AUTOCOMPLETE BARCODE
+// DATABASE BARCODE LOKAL
 // ==================================================
 
-let suggestTimers = {};
+let barcodeDatabase = [];
+let barcodeIndex = {};
+let databaseReady = false;
+let databaseLoading = false;
+
+const DATABASE_STORAGE_KEY =
+    'CEK_PRODUK_EXPIRED_DATABASE';
+
+const DATABASE_TIME_KEY =
+    'CEK_PRODUK_EXPIRED_DATABASE_TIME';
 
 
 // ==================================================
-// BUAT DROPDOWN OTOMATIS
+// LOAD DATABASE SAAT WEBSITE DIBUKA
+// ==================================================
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+        loadLocalDatabase();
+
+    }
+);
+
+
+// ==================================================
+// LOAD DATABASE DARI LOCAL STORAGE
+// ==================================================
+
+function loadLocalDatabase() {
+
+    let savedData = null;
+
+    try {
+
+        savedData =
+            localStorage.getItem(
+                DATABASE_STORAGE_KEY
+            );
+
+    } catch (error) {
+
+        console.log(
+            'LocalStorage tidak tersedia'
+        );
+
+    }
+
+
+    // ==================================================
+    // JIKA ADA DATABASE TERSIMPAN
+    // LANGSUNG PAKAI
+    // ==================================================
+
+    if (savedData) {
+
+        try {
+
+            barcodeDatabase =
+                JSON.parse(savedData);
+
+            buildBarcodeIndex();
+
+            databaseReady = true;
+
+            console.log(
+                'Database lokal siap:',
+                barcodeDatabase.length,
+                'produk'
+            );
+
+
+            // ==================================================
+            // UPDATE DATABASE DI BACKGROUND
+            // ==================================================
+
+            loadDatabaseFromServer(
+                true
+            );
+
+            return;
+
+        } catch (error) {
+
+            console.log(
+                'Database lokal rusak, load ulang'
+            );
+
+        }
+
+    }
+
+
+    // ==================================================
+    // BELUM ADA DATABASE
+    // LOAD DARI SERVER
+    // ==================================================
+
+    loadDatabaseFromServer(
+        false
+    );
+
+}
+
+
+// ==================================================
+// LOAD DATABASE DARI GOOGLE APPS SCRIPT
+// ==================================================
+
+function loadDatabaseFromServer(background) {
+
+    if (databaseLoading) {
+        return;
+    }
+
+    databaseLoading = true;
+
+
+    showDatabaseStatus(
+        background
+            ? 'Memperbarui database...'
+            : 'Memuat database...'
+    );
+
+
+    const callbackName =
+        'loadDatabaseCallback_' +
+        Date.now();
+
+
+    window[callbackName] =
+        function(data) {
+
+            databaseLoading = false;
+
+
+            if (
+                data &&
+                data.success &&
+                Array.isArray(data.data)
+            ) {
+
+                barcodeDatabase =
+                    data.data;
+
+
+                // ==================================================
+                // BUAT INDEX
+                // ==================================================
+
+                buildBarcodeIndex();
+
+
+                databaseReady = true;
+
+
+                // ==================================================
+                // SIMPAN KE LOCAL STORAGE
+                // ==================================================
+
+                try {
+
+                    localStorage.setItem(
+                        DATABASE_STORAGE_KEY,
+                        JSON.stringify(
+                            barcodeDatabase
+                        )
+                    );
+
+                    localStorage.setItem(
+                        DATABASE_TIME_KEY,
+                        Date.now().toString()
+                    );
+
+                } catch (error) {
+
+                    console.log(
+                        'Gagal menyimpan database lokal:',
+                        error
+                    );
+
+                }
+
+
+                console.log(
+                    'Database berhasil dimuat:',
+                    data.total,
+                    'produk'
+                );
+
+
+                showDatabaseStatus(
+                    'Database siap'
+                );
+
+
+            } else {
+
+                console.error(
+                    'Database gagal dimuat',
+                    data
+                );
+
+
+                showDatabaseStatus(
+                    'Database gagal dimuat'
+                );
+
+            }
+
+
+            delete window[callbackName];
+
+
+            if (script.parentNode) {
+
+                script.parentNode.removeChild(
+                    script
+                );
+
+            }
+
+        };
+
+
+    const script =
+        document.createElement(
+            'script'
+        );
+
+
+    script.src =
+        API_URL +
+        '?action=loadDatabase' +
+        '&callback=' +
+        encodeURIComponent(
+            callbackName
+        );
+
+
+    script.onerror =
+        function() {
+
+            databaseLoading = false;
+
+
+            console.error(
+                'Gagal mengambil database'
+            );
+
+
+            showDatabaseStatus(
+                'Gagal memuat database'
+            );
+
+
+            delete window[callbackName];
+
+
+            if (script.parentNode) {
+
+                script.parentNode.removeChild(
+                    script
+                );
+
+            }
+
+        };
+
+
+    document.body.appendChild(
+        script
+    );
+
+}
+
+
+// ==================================================
+// BUAT INDEX BARCODE
+//
+// Contoh:
+//
+// 0400308860007
+//      ↓
+// INDEX "040"
+//
+// 8994892000823
+//      ↓
+// INDEX "899"
+// ==================================================
+
+function buildBarcodeIndex() {
+
+    barcodeIndex = {};
+
+
+    for (
+        let i = 0;
+        i < barcodeDatabase.length;
+        i++
+    ) {
+
+        const barcode =
+            String(
+                barcodeDatabase[i].barcode || ''
+            ).trim();
+
+
+        if (!barcode) {
+            continue;
+        }
+
+
+        const prefix =
+            barcode.substring(
+                0,
+                3
+            );
+
+
+        if (!barcodeIndex[prefix]) {
+
+            barcodeIndex[prefix] = [];
+
+        }
+
+
+        barcodeIndex[prefix].push(
+            barcodeDatabase[i]
+        );
+
+    }
+
+
+    console.log(
+        'Index barcode selesai'
+    );
+
+}
+
+
+// ==================================================
+// STATUS DATABASE
+// ==================================================
+
+function showDatabaseStatus(text) {
+
+    let status =
+        document.getElementById(
+            'databaseStatus'
+        );
+
+
+    // Kalau elemen status belum ada,
+    // tidak perlu membuat error
+    if (!status) {
+        return;
+    }
+
+
+    status.textContent =
+        text;
+
+
+    if (
+        text === 'Database siap'
+    ) {
+
+        status.classList.add(
+            'database-ready'
+        );
+
+    } else {
+
+        status.classList.remove(
+            'database-ready'
+        );
+
+    }
+
+}
+
+
+// ==================================================
+// BUAT DROPDOWN
 // ==================================================
 
 function getSuggestionBox(nomor) {
 
+    const input =
+        document.getElementById(
+            'barcode' + nomor
+        );
+
+
     const barcodeArea =
-        document.querySelector(
-            '#barcode' + nomor
-        ).closest('.barcode-area');
+        input.closest(
+            '.barcode-area'
+        );
+
 
     let dropdown =
         document.getElementById(
             'barcodeSuggestions' + nomor
         );
 
+
     if (!dropdown) {
 
         dropdown =
-            document.createElement('div');
+            document.createElement(
+                'div'
+            );
+
 
         dropdown.id =
             'barcodeSuggestions' + nomor;
 
+
         dropdown.className =
             'barcode-suggestions';
+
 
         barcodeArea.appendChild(
             dropdown
         );
+
     }
 
+
     return dropdown;
+
 }
 
 
 // ==================================================
-// CARI SARAN BARCODE
+// CARI BARCODE LOKAL
 // ==================================================
 
 function suggestBarcode(nomor) {
@@ -160,206 +557,249 @@ function suggestBarcode(nomor) {
             'barcode' + nomor
         );
 
+
     const nameElement =
         document.getElementById(
             'productName' + nomor
         );
 
+
     const dropdown =
         getSuggestionBox(nomor);
+
 
     const barcode =
         barcodeInput.value.trim();
 
 
-    // Kosong
+    // ==================================================
+    // KOSONG
+    // ==================================================
+
     if (!barcode) {
 
-        dropdown.innerHTML = '';
-        dropdown.style.display = 'none';
+        dropdown.innerHTML =
+            '';
+
+        dropdown.style.display =
+            'none';
 
         return;
+
     }
 
 
-    // Minimal 3 angka
+    // ==================================================
+    // MINIMAL 3 DIGIT
+    // ==================================================
+
     if (barcode.length < 3) {
 
-        dropdown.innerHTML = '';
-        dropdown.style.display = 'none';
+        dropdown.innerHTML =
+            '';
+
+        dropdown.style.display =
+            'none';
 
         return;
+
     }
 
 
-    // Batalkan timer sebelumnya
-    clearTimeout(
-        suggestTimers[nomor]
-    );
+    // ==================================================
+    // DATABASE BELUM SIAP
+    // ==================================================
+
+    if (!databaseReady) {
+
+        dropdown.innerHTML =
+            '<div class="barcode-suggestion-item">' +
+            '⏳ Database sedang dimuat...' +
+            '</div>';
+
+        dropdown.style.display =
+            'block';
+
+        return;
+
+    }
 
 
-    // Tunggu 300 ms
-    suggestTimers[nomor] =
-        setTimeout(function() {
+    // ==================================================
+    // PILIH DATA BERDASARKAN 3 DIGIT AWAL
+    // ==================================================
 
-            const callbackName =
-                'suggestCallback_' +
-                nomor +
-                '_' +
-                Date.now();
-
-
-            window[callbackName] =
-                function(data) {
-
-                    // ==========================================
-                    // BERSIHKAN DROPDOWN
-                    // ==========================================
-
-                    dropdown.innerHTML = '';
+    const prefix =
+        barcode.substring(
+            0,
+            3
+        );
 
 
-                    if (
-                        data.success &&
-                        data.suggestions &&
-                        data.suggestions.length > 0
-                    ) {
-
-                        data.suggestions.forEach(
-                            function(item) {
-
-                                const div =
-                                    document.createElement(
-                                        'div'
-                                    );
-
-                                div.className =
-                                    'barcode-suggestion-item';
+    const candidates =
+        barcodeIndex[prefix] || [];
 
 
-                                div.innerHTML =
-                                    '<div class="suggestion-barcode">' +
-                                    item.barcode +
-                                    '</div>' +
-
-                                    '<div class="suggestion-name">' +
-                                    item.prod_nm +
-                                    '</div>';
+    const suggestions = [];
 
 
-                                // ==================================
-                                // KLIK PILIHAN
-                                // ==================================
+    // ==================================================
+    // CARI
+    // ==================================================
 
-                                div.addEventListener(
-                                    'mousedown',
-                                    function(event) {
+    for (
+        let i = 0;
+        i < candidates.length;
+        i++
+    ) {
 
-                                        event.preventDefault();
-
-
-                                        barcodeInput.value =
-                                            item.barcode;
-
-
-                                        nameElement.textContent =
-                                            item.prod_nm;
+        const item =
+            candidates[i];
 
 
-                                        dropdown.innerHTML =
-                                            '';
-
-                                        dropdown.style.display =
-                                            'none';
-
-                                    }
-                                );
+        const barcodeDB =
+            String(
+                item.barcode
+            ).trim();
 
 
-                                dropdown.appendChild(
-                                    div
-                                );
-
-                            }
-                        );
+        let cocok = false;
 
 
-                        dropdown.style.display =
-                            'block';
+        // ==================================================
+        // 13 DIGIT ATAU LEBIH
+        // EXACT MATCH
+        // ==================================================
 
-                    } else {
+        if (
+            barcode.length >= 13
+        ) {
 
-                        dropdown.style.display =
-                            'none';
+            cocok =
+                barcodeDB === barcode;
 
-                    }
-
-
-                    delete window[callbackName];
-
-
-                    if (script.parentNode) {
-
-                        script.parentNode.removeChild(
-                            script
-                        );
-
-                    }
-
-                };
+        }
 
 
-            // ==========================================
-            // REQUEST JSONP
-            // ==========================================
+        // ==================================================
+        // 3 - 12 DIGIT
+        // PARTIAL MATCH
+        // ==================================================
 
-            const script =
-                document.createElement('script');
+        else {
+
+            cocok =
+                barcodeDB.indexOf(
+                    barcode
+                ) !== -1;
+
+        }
 
 
-            script.src =
-                API_URL +
-                '?action=suggest' +
-                '&barcode=' +
-                encodeURIComponent(barcode) +
-                '&callback=' +
-                encodeURIComponent(
-                    callbackName
+        if (cocok) {
+
+            suggestions.push(
+                item
+            );
+
+        }
+
+
+        // Maksimal 10
+        if (
+            suggestions.length >= 10
+        ) {
+
+            break;
+
+        }
+
+    }
+
+
+    // ==================================================
+    // TAMPILKAN DROPDOWN
+    // ==================================================
+
+    dropdown.innerHTML =
+        '';
+
+
+    if (
+        suggestions.length === 0
+    ) {
+
+        dropdown.style.display =
+            'none';
+
+        return;
+
+    }
+
+
+    suggestions.forEach(
+        function(item) {
+
+            const div =
+                document.createElement(
+                    'div'
                 );
 
 
-            script.onerror =
-                function() {
+            div.className =
+                'barcode-suggestion-item';
+
+
+            div.innerHTML =
+
+                '<div class="suggestion-barcode">' +
+                item.barcode +
+                '</div>' +
+
+                '<div class="suggestion-name">' +
+                item.prod_nm +
+                '</div>';
+
+
+            // ==================================================
+            // PILIH SUGGESTION
+            // ==================================================
+
+            div.addEventListener(
+                'mousedown',
+                function(event) {
+
+                    event.preventDefault();
+
+
+                    barcodeInput.value =
+                        item.barcode;
+
+
+                    nameElement.textContent =
+                        item.prod_nm;
+
 
                     dropdown.innerHTML =
-                        '<div class="barcode-suggestion-item">' +
-                        'Gagal terhubung ke server' +
-                        '</div>';
+                        '';
 
                     dropdown.style.display =
-                        'block';
+                        'none';
 
-
-                    delete window[callbackName];
-
-
-                    if (script.parentNode) {
-
-                        script.parentNode.removeChild(
-                            script
-                        );
-
-                    }
-
-                };
-
-
-            document.body.appendChild(
-                script
+                }
             );
 
 
-        }, 150);
+            dropdown.appendChild(
+                div
+            );
+
+        }
+    );
+
+
+    dropdown.style.display =
+        'block';
 
 }
 
@@ -378,7 +818,9 @@ document.addEventListener(
 
         if (
             target.tagName === 'INPUT' &&
-            /^barcode[1-7]$/.test(target.id)
+            /^barcode[1-7]$/.test(
+                target.id
+            )
         ) {
 
             const nomor =
@@ -401,7 +843,7 @@ document.addEventListener(
 
 
 // ==================================================
-// TUTUP DROPDOWN JIKA KLIK DI LUAR
+// TUTUP DROPDOWN KLIK DI LUAR
 // ==================================================
 
 document.addEventListener(
