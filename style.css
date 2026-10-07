@@ -2,6 +2,11 @@
     box-sizing: border-box;
 }
 
+
+/* ==================================================
+   HTML & BODY
+   ================================================== */
+
 html,
 body {
     margin: 0;
@@ -15,6 +20,55 @@ body {
     color: #222;
 }
 
+
+/* ==================================================
+   LOADING DATABASE
+   ================================================== */
+
+#databaseLoading {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.96);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+
+.database-loading-box {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1976D2;
+}
+
+.loading-spinner {
+    width: 45px;
+    height: 45px;
+    margin: 0 auto 15px;
+    border: 5px solid #e0e0e0;
+    border-top: 5px solid #1976D2;
+    border-radius: 50%;
+    animation: databaseSpin 0.8s linear infinite;
+}
+
+@keyframes databaseSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* ==================================================
+   CONTAINER
+   ================================================== */
+
 .container {
     width: 100%;
     max-width: 900px;
@@ -24,7 +78,10 @@ body {
     background: #ffffff;
 }
 
-/* HEADER */
+
+/* ==================================================
+   HEADER
+   ================================================== */
 
 header {
     text-align: center;
@@ -44,7 +101,10 @@ header p {
     font-size: 14px;
 }
 
-/* PRODUCT */
+
+/* ==================================================
+   PRODUCT BOX
+   ================================================== */
 
 .product-box {
     margin-bottom: 10px;
@@ -54,22 +114,20 @@ header p {
     border-radius: 8px;
 }
 
-.product-title {
-    margin-bottom: 9px;
-    color: #1976d2;
-    font-size: 15px;
-    font-weight: bold;
-}
 
-/* BARCODE + EXPIRED */
+/* ==================================================
+   BARCODE + EXPIRED
+   ================================================== */
 
 .input-row {
     display: flex;
     gap: 10px;
     width: 100%;
+    align-items: flex-start;
 }
 
 .barcode-area {
+    position: relative;
     flex: 1;
     min-width: 0;
 }
@@ -79,14 +137,45 @@ header p {
     flex-shrink: 0;
 }
 
-/* NIE */
+
+/* ==================================================
+   NOMOR PRODUK + LABEL BARCODE
+   ================================================== */
+
+.barcode-label-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.product-number {
+    width: 24px;
+    min-width: 24px;
+    color: #1976d2;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.barcode-label-row label {
+    margin: 0;
+}
+
+
+/* ==================================================
+   NIE
+   ================================================== */
 
 .nie-area {
     width: 100%;
     margin-top: 10px;
 }
 
-/* LABEL */
+
+/* ==================================================
+   LABEL
+   ================================================== */
 
 label {
     display: block;
@@ -96,7 +185,10 @@ label {
     font-weight: bold;
 }
 
-/* INPUT */
+
+/* ==================================================
+   INPUT
+   ================================================== */
 
 input {
     width: 100%;
@@ -120,7 +212,10 @@ input::placeholder {
     color: #999;
 }
 
-/* BARCODE SEARCH */
+
+/* ==================================================
+   BARCODE SEARCH
+   ================================================== */
 
 .barcode-search {
     display: flex;
@@ -155,7 +250,10 @@ input::placeholder {
     transform: scale(0.98);
 }
 
-/* PRODUCT NAME */
+
+/* ==================================================
+   PRODUCT NAME
+   ================================================== */
 
 .product-name {
     min-height: 18px;
@@ -164,7 +262,10 @@ input::placeholder {
     font-size: 13px;
 }
 
-/* EXPIRED HINT */
+
+/* ==================================================
+   EXPIRED HINT
+   ================================================== */
 
 .expired-area small {
     display: block;
@@ -173,225 +274,16 @@ input::placeholder {
     font-size: 11px;
 }
 
-/* MESSAGE */
-
-.message {
-    display: none;
-    margin: 15px 0;
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    line-height: 1.5;
-    white-space: pre-line;
-}
-
-.message.success {
-    display: block;
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.message.error {
-    display: block;
-    background: #ffebee;
-    color: #c62828;
-}
-
-/* SAVE BUTTON */
-
-#saveButton {
-    display: block;
-    width: 100%;
-    height: 50px;
-    margin-top: 15px;
-    border: none;
-    border-radius: 7px;
-    background: #1976d2;
-    color: #ffffff;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#saveButton:hover {
-    background: #1565c0;
-}
-
-#saveButton:active {
-    transform: scale(0.99);
-}
-
-#saveButton:disabled {
-    opacity: 0.6;
-    cursor: wait;
-}
-
-/* FOOTER */
-
-footer {
-    margin-top: 20px;
-    color: #888888;
-    text-align: center;
-    font-size: 11px;
-}
-
-/* MOBILE */
-
-@media (max-width: 600px) {
-
-    .container {
-        padding: 10px;
-    }
-
-    header {
-        margin-bottom: 15px;
-    }
-
-    header h1 {
-        font-size: 23px;
-    }
-
-    header p {
-        font-size: 13px;
-    }
-
-    .product-box {
-        margin-bottom: 8px;
-        padding: 9px;
-        border-radius: 7px;
-    }
-
-    .product-title {
-        margin-bottom: 7px;
-        font-size: 14px;
-    }
-
-    /*
-        MOBILE:
-        BARCODE + EXPIRED
-        berada dalam satu baris
-    */
-
-    .input-row {
-        display: flex;
-        gap: 6px;
-        align-items: flex-start;
-    }
-
-    /*
-        BARCODE lebih lebar
-    */
-
-    .barcode-area {
-        flex: 1;
-        min-width: 0;
-    }
-
-    /*
-        EXPIRED lebih kecil
-    */
-
-    .expired-area {
-        width: 105px;
-        flex-shrink: 0;
-    }
-
-    /*
-        NIE tetap satu baris penuh
-    */
-
-    .nie-area {
-        margin-top: 7px;
-    }
-
-    label {
-        margin-bottom: 3px;
-        font-size: 11px;
-    }
-
-    input {
-        height: 40px;
-        padding: 7px 8px;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-
-    .barcode-search {
-        gap: 4px;
-    }
-
-    .barcode-search button {
-        width: 62px;
-        height: 40px;
-        font-size: 10px;
-    }
-
-    .product-name {
-        min-height: 15px;
-        margin-top: 3px;
-        font-size: 11px;
-    }
-
-    .expired-area small {
-        margin-top: 2px;
-        font-size: 9px;
-    }
-
-    #saveButton {
-        height: 48px;
-        margin-top: 12px;
-        font-size: 16px;
-    }
-
-    footer {
-        margin-top: 15px;
-    }
-}
-
-/* VERY SMALL MOBILE */
-
-@media (max-width: 380px) {
-
-    .container {
-        padding: 7px;
-    }
-
-    .product-box {
-        padding: 8px;
-    }
-
-    .input-row {
-        gap: 5px;
-    }
-
-    .expired-area {
-        width: 95px;
-    }
-
-    .barcode-search button {
-        width: 55px;
-        font-size: 9px;
-    }
-
-    input {
-        padding: 6px 7px;
-        font-size: 13px;
-    }
-}
 
 /* ==================================================
    AUTOCOMPLETE BARCODE
    ================================================== */
 
-.barcode-area {
-    position: relative;
-}
-
 .barcode-suggestions {
     position: absolute;
-    left: 0;
+    left: 32px;
     right: 0;
-    top: 100px;
+    top: 68px;
     background: #ffffff;
     border: 1px solid #cccccc;
     border-radius: 6px;
@@ -427,14 +319,302 @@ footer {
     font-size: 13px;
     margin-top: 3px;
 }
-.database-status {
-    text-align: center;
-    font-size: 13px;
-    color: #777;
-    margin: 5px 0 15px;
+
+
+/* ==================================================
+   SCANNER
+   ================================================== */
+
+.scanner-container {
+    width: 100%;
+    margin-top: 8px;
 }
 
-.database-status.database-ready {
-    color: #28A745;
+
+/* ==================================================
+   MESSAGE
+   ================================================== */
+
+.message {
+    display: none;
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.message.success {
+    display: block;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.message.error {
+    display: block;
+    background: #ffebee;
+    color: #c62828;
+}
+
+
+/* ==================================================
+   SAVE BUTTON
+   ================================================== */
+
+#saveButton {
+    display: block;
+    width: 100%;
+    height: 50px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 7px;
+    background: #1976d2;
+    color: #ffffff;
+    font-size: 17px;
     font-weight: bold;
+    cursor: pointer;
+}
+
+#saveButton:hover {
+    background: #1565c0;
+}
+
+#saveButton:active {
+    transform: scale(0.99);
+}
+
+#saveButton:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
+/* ==================================================
+   FOOTER
+   ================================================== */
+
+footer {
+    margin-top: 20px;
+    color: #888888;
+    text-align: center;
+    font-size: 11px;
+}
+
+
+/* ==================================================
+   MOBILE
+   ================================================== */
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 10px;
+    }
+
+
+    /* HEADER */
+
+    header {
+        margin-bottom: 15px;
+    }
+
+    header h1 {
+        font-size: 23px;
+    }
+
+    header p {
+        font-size: 13px;
+    }
+
+
+    /* PRODUCT */
+
+    .product-box {
+        margin-bottom: 8px;
+        padding: 9px;
+        border-radius: 7px;
+    }
+
+
+    /* BARCODE + EXPIRED */
+
+    .input-row {
+        display: flex;
+        gap: 6px;
+        align-items: flex-start;
+    }
+
+    .barcode-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .expired-area {
+        width: 105px;
+        flex-shrink: 0;
+    }
+
+
+    /* NOMOR PRODUK */
+
+    .barcode-label-row {
+        gap: 5px;
+        margin-bottom: 3px;
+    }
+
+    .product-number {
+        width: 20px;
+        min-width: 20px;
+        font-size: 14px;
+    }
+
+
+    /* NIE */
+
+    .nie-area {
+        margin-top: 7px;
+    }
+
+
+    /* LABEL */
+
+    label {
+        margin-bottom: 3px;
+        font-size: 11px;
+    }
+
+
+    /* INPUT */
+
+    input {
+        height: 40px;
+        padding: 7px 8px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+
+    /* BARCODE */
+
+    .barcode-search {
+        gap: 4px;
+    }
+
+    .barcode-search button {
+        width: 62px;
+        height: 40px;
+        font-size: 10px;
+    }
+
+
+    /* PRODUCT NAME */
+
+    .product-name {
+        min-height: 15px;
+        margin-top: 3px;
+        font-size: 11px;
+    }
+
+
+    /* EXPIRED */
+
+    .expired-area small {
+        margin-top: 2px;
+        font-size: 9px;
+    }
+
+
+    /* AUTOCOMPLETE */
+
+    .barcode-suggestions {
+        left: 25px;
+        top: 62px;
+    }
+
+    .barcode-suggestion-item {
+        padding: 9px 10px;
+    }
+
+    .suggestion-barcode {
+        font-size: 14px;
+    }
+
+    .suggestion-name {
+        font-size: 11px;
+    }
+
+
+    /* SAVE */
+
+    #saveButton {
+        height: 48px;
+        margin-top: 12px;
+        font-size: 16px;
+    }
+
+
+    /* FOOTER */
+
+    footer {
+        margin-top: 15px;
+    }
+
+
+    /* LOADING */
+
+    .database-loading-box {
+        font-size: 18px;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+    }
+
+}
+
+
+/* ==================================================
+   VERY SMALL MOBILE
+   ================================================== */
+
+@media (max-width: 380px) {
+
+    .container {
+        padding: 7px;
+    }
+
+    .product-box {
+        padding: 8px;
+    }
+
+    .input-row {
+        gap: 5px;
+    }
+
+    .expired-area {
+        width: 95px;
+    }
+
+    .barcode-search button {
+        width: 55px;
+        font-size: 9px;
+    }
+
+    input {
+        padding: 6px 7px;
+        font-size: 13px;
+    }
+
+    .product-number {
+        width: 18px;
+        min-width: 18px;
+        font-size: 13px;
+    }
+
+    .barcode-label-row {
+        gap: 4px;
+    }
+
 }
