@@ -427,3 +427,14 @@ footer {
     font-size: 13px;
     margin-top: 3px;
 }
+.database-status {
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+    margin: 5px 0 15px;
+}
+
+.database-status.database-ready {
+    color: #28A745;
+    font-weight: bold;
+}
