@@ -63,6 +63,7 @@ header p {
    ================================================== */
 
 .product-box {
+    width: 100%;
     margin-bottom: 8px;
     padding: 10px;
     background: #ffffff;
@@ -80,10 +81,13 @@ header p {
     align-items: flex-start;
     gap: 8px;
     width: 100%;
+    flex-wrap: nowrap;
 }
 
 
-/* NOMOR PRODUK */
+/* ==================================================
+   NOMOR PRODUK
+   ================================================== */
 
 .product-number {
     width: 22px;
@@ -102,7 +106,7 @@ header p {
 
 .barcode-area {
     position: relative;
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -113,19 +117,20 @@ header p {
 
 .barcode-search {
     display: flex;
+    align-items: center;
     gap: 6px;
-    width: 75%;
+    width: 100%;
 }
 
 .barcode-search input {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
 }
 
 .barcode-search button {
     width: 85px;
     height: 34px;
-    flex-shrink: 0;
+    flex: 0 0 85px;
     padding: 0;
     border: none;
     border-radius: 6px;
@@ -158,12 +163,13 @@ header p {
 
 
 /* ==================================================
-   EXPIRED - DI SAMPING BARCODE
+   EXPIRED
    ================================================== */
 
 .expired-inline {
     width: 180px;
     min-width: 180px;
+    flex: 0 0 180px;
 }
 
 .expired-inline label {
@@ -194,6 +200,7 @@ header p {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: calc(100% - 30px);
     margin-top: 4px;
     margin-left: 30px;
 }
@@ -205,7 +212,8 @@ header p {
 }
 
 .nie-row input {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 
@@ -255,7 +263,7 @@ input::placeholder {
 .barcode-suggestions {
     position: absolute;
     left: 0;
-    width: 75%;
+    width: 100%;
     top: 40px;
     background: #ffffff;
     border: 1px solid #cccccc;
@@ -415,6 +423,7 @@ footer {
 
     .product-main-row {
         gap: 5px;
+        flex-wrap: nowrap;
     }
 
 
@@ -428,15 +437,25 @@ footer {
     }
 
 
-    /* BARCODE */
+    /* BARCODE AREA */
+
+    .barcode-area {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+
+    /* BARCODE SEARCH */
 
     .barcode-search {
+        display: flex;
         gap: 4px;
-        width: 75%;
+        width: 100%;
     }
 
     .barcode-search button {
         width: 62px;
+        flex: 0 0 62px;
         height: 32px;
         font-size: 10px;
     }
@@ -466,6 +485,7 @@ footer {
     .expired-inline {
         width: 110px;
         min-width: 110px;
+        flex: 0 0 110px;
     }
 
     .expired-inline label {
@@ -483,6 +503,7 @@ footer {
 
     .nie-row {
         gap: 6px;
+        width: calc(100% - 25px);
         margin-top: 3px;
         margin-left: 25px;
     }
@@ -497,7 +518,7 @@ footer {
     /* AUTOCOMPLETE */
 
     .barcode-suggestions {
-        width: 75%;
+        width: 100%;
         top: 38px;
         left: 0;
     }
@@ -559,6 +580,7 @@ footer {
 
     .product-main-row {
         gap: 4px;
+        flex-wrap: nowrap;
     }
 
 
@@ -574,12 +596,19 @@ footer {
 
     /* BARCODE */
 
+    .barcode-area {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
     .barcode-search {
-        width: 75%;
+        width: 100%;
+        gap: 3px;
     }
 
     .barcode-search button {
         width: 55px;
+        flex: 0 0 55px;
         height: 32px;
         font-size: 9px;
     }
@@ -599,6 +628,7 @@ footer {
     .expired-inline {
         width: 95px;
         min-width: 95px;
+        flex: 0 0 95px;
     }
 
     .expired-inline label {
@@ -609,6 +639,7 @@ footer {
     /* NIE */
 
     .nie-row {
+        width: calc(100% - 22px);
         margin-left: 22px;
     }
 
