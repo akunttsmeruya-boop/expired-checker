@@ -107,635 +107,18 @@ function searchProduct(nomor) {
 }
 
 // ==================================================
-// DATABASE BARCODE - INDEXEDDB CACHE
-// CACHE 24 JAM + BACKGROUND UPDATE
-// ==================================================
-
-const DB_NAME = 'CEK_PRODUK_EXPIRED_DB';
-const DB_VERSION = 1;
-const DB_STORE = 'database';
-
-const CACHE_KEY = 'barcodeDatabase';
-const CACHE_MAX_AGE = 24 * 60 * 60 * 1000; // 24 jam
-
-let barcodeDatabase = [];
-let barcodeMap = {};
-let databaseReady = false;
-let databaseLoading = false;
-
-
-// ==================================================
-// BUKA INDEXEDDB
-// ==================================================
-
-function openBarcodeDB() {
-
-    return new Promise(function(resolve, reject) {
-
-        const request = indexedDB.open(
-            DB_NAME,
-            DB_VERSION
-        );
-
-        request.onupgradeneeded = function(event) {
-
-            const db = event.target.result;
-
-            if (!db.objectStoreNames.contains(DB_STORE)) {
-
-                db.createObjectStore(
-                    DB_STORE
-                );
-
-            }
-
-        };
-
-        request.onsuccess = function(event) {
-
-            resolve(
-                event.target.result
-            );
-
-        };
-
-        request.onerror = function() {
-
-            reject(
-                request.error
-            );
-
-        };
-
-    });
-
-}
-
-
-// ==================================================
-// SIMPAN DATABASE KE INDEXEDDB
-// ==================================================
-
-async function saveDatabaseToCache(data) {
-
-    try {
-
-        const db =
-            await openBarcodeDB();
-
-        return new Promise(function(resolve, reject) {
-
-            const transaction =
-                db.transaction(
-                    DB_STORE,
-                    'readwrite'
-                );
-
-            const store =
-                transaction.objectStore(
-                    DB_STORE
-                );
-
-            store.put(
-                {
-                    data: data,
-                    time: Date.now()
-                },
-                CACHE_KEY
-            );
-
-            transaction.oncomplete =
-                function() {
-
-                    resolve(true);
-
-                };
-
-            transaction.onerror =
-                function() {
-
-                    reject(
-                        transaction.error
-                    );
-
-                };
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Gagal menyimpan cache:',
-            error
-        );
-
-        return false;
-
-    }
-
-}
-
-
-// ==================================================
-// BACA DATABASE DARI INDEXEDDB
-// ==================================================
-
-async function getDatabaseFromCache() {
-
-    try {
-
-        const db =
-            await openBarcodeDB();
-
-        return new Promise(function(resolve, reject) {
-
-            const transaction =
-                db.transaction(
-                    DB_STORE,
-                    'readonly'
-                );
-
-            const store =
-                transaction.objectStore(
-                    DB_STORE
-                );
-
-            const request =
-                store.get(
-                    CACHE_KEY
-                );
-
-            request.onsuccess =
-                function() {
-
-                    resolve(
-                        request.result || null
-                    );
-
-                };
-
-            request.onerror =
-                function() {
-
-                    reject(
-                        request.error
-                    );
-
-                };
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Gagal membaca cache:',
-            error
-        );
-
-        return null;
-
-    }
-
-}
-
-
-// ==================================================
-// BUAT INDEX BARCODE
-// ==================================================
-
-function buildBarcodeIndex() {
-
-    barcodeMap = {};
-
-    for (
-        let i = 0;
-        i < barcodeDatabase.length;
-        i++
-    ) {
-
-        const item =
-            barcodeDatabase[i];
-
-        const barcode =
-            String(
-                item.barcode || ''
-            ).trim();
-
-        if (!barcode) {
-            continue;
-        }
-
-        barcodeMap[barcode] =
-            item;
-
-    }
-
-    console.log(
-        'Index barcode:',
-        Object.keys(barcodeMap).length
-    );
-
-}
-
-
-// ==================================================
-// AKTIFKAN DATABASE
-// ==================================================
-
-function activateDatabase(data) {
-
-    if (
-        !Array.isArray(data)
-    ) {
-
-        return false;
-
-    }
-
-    barcodeDatabase =
-        data;
-
-    buildBarcodeIndex();
-
-    databaseReady = true;
-
-    return true;
-
-}
-
-
-// ==================================================
-// LOAD DATABASE SAAT WEBSITE DIBUKA
-// ==================================================
-
-document.addEventListener(
-    'DOMContentLoaded',
-    async function() {
-
-        await initializeBarcodeDatabase();
-
-    }
-);
-
-
-// ==================================================
-// INITIALIZE DATABASE
-// ==================================================
-
-async function initializeBarcodeDatabase() {
-
-    const cache =
-        await getDatabaseFromCache();
-
-    // ==============================================
-    // ADA CACHE
-    // ==============================================
-
-    if (
-        cache &&
-        Array.isArray(cache.data) &&
-        cache.data.length > 0
-    ) {
-
-        console.log(
-            'Cache ditemukan:',
-            cache.data.length,
-            'produk'
-        );
-
-        activateDatabase(
-            cache.data
-        );
-
-        // Jangan tunggu server
-        hideDatabaseLoading();
-
-        // ==========================================
-        // CEK UMUR CACHE
-        // ==========================================
-
-        const cacheAge =
-            Date.now() -
-            Number(cache.time || 0);
-
-        if (
-            cacheAge >= CACHE_MAX_AGE
-        ) {
-
-            console.log(
-                'Cache lebih dari 24 jam.'
-            );
-
-            loadDatabaseFromServer(
-                true
-            );
-
-        } else {
-
-            console.log(
-                'Cache masih valid.'
-            );
-
-            // Tidak perlu download
-            // setiap buka website.
-
-        }
-
-        return;
-
-    }
-
-
-    // ==============================================
-    // BELUM ADA CACHE
-    // ==============================================
-
-    console.log(
-        'Belum ada cache.'
-    );
-
-    showDatabaseLoading();
-
-    await loadDatabaseFromServer(
-        false
-    );
-
-}
-
-
-// ==================================================
-// LOAD DATABASE DARI SERVER
-// ==================================================
-
-function loadDatabaseFromServer(background) {
-
-    return new Promise(function(resolve) {
-
-        if (databaseLoading) {
-
-            resolve(false);
-
-            return;
-
-        }
-
-        databaseLoading = true;
-
-        if (!background) {
-
-            showDatabaseLoading();
-
-        }
-
-        const callbackName =
-            'databaseCallback_' +
-            Date.now();
-
-        const script =
-            document.createElement(
-                'script'
-            );
-
-        let finished = false;
-
-
-        function finish(success) {
-
-            if (finished) {
-                return;
-            }
-
-            finished = true;
-
-            databaseLoading = false;
-
-            delete window[callbackName];
-
-            if (
-                script.parentNode
-            ) {
-
-                script.parentNode.removeChild(
-                    script
-                );
-
-            }
-
-            resolve(success);
-
-        }
-
-
-        window[callbackName] =
-            async function(data) {
-
-                if (
-                    data &&
-                    data.success &&
-                    Array.isArray(data.data)
-                ) {
-
-                    console.log(
-                        'Database server:',
-                        data.data.length,
-                        'produk'
-                    );
-
-                    activateDatabase(
-                        data.data
-                    );
-
-                    await saveDatabaseToCache(
-                        data.data
-                    );
-
-                    console.log(
-                        'Database berhasil disimpan ke cache.'
-                    );
-
-                    if (!background) {
-
-                        hideDatabaseLoading();
-
-                    }
-
-                    finish(true);
-
-                } else {
-
-                    console.error(
-                        'Database gagal:',
-                        data
-                    );
-
-                    if (!background) {
-
-                        showDatabaseError();
-
-                    }
-
-                    finish(false);
-
-                }
-
-            };
-
-
-        script.onerror =
-            function() {
-
-                console.error(
-                    'Gagal mengambil database server.'
-                );
-
-                if (!background) {
-
-                    showDatabaseError();
-
-                }
-
-                finish(false);
-
-            };
-
-
-        script.src =
-            API_URL +
-            '?action=loadDatabase' +
-            '&callback=' +
-            encodeURIComponent(
-                callbackName
-            );
-
-        document.body.appendChild(
-            script
-        );
-
-    });
-
-}
-
-
-// ==================================================
-// LOADING
-// ==================================================
-
-function showDatabaseLoading() {
-
-    const loading =
-        document.getElementById(
-            'databaseLoading'
-        );
-
-    if (!loading) {
-        return;
-    }
-
-    loading.style.display =
-        'flex';
-
-}
-
-
-// ==================================================
-// SEMBUNYIKAN LOADING
-// ==================================================
-
-function hideDatabaseLoading() {
-
-    const loading =
-        document.getElementById(
-            'databaseLoading'
-        );
-
-    if (!loading) {
-        return;
-    }
-
-    loading.style.display =
-        'none';
-
-}
-
-
-// ==================================================
-// DATABASE ERROR
-// ==================================================
-
-function showDatabaseError() {
-
-    const loading =
-        document.getElementById(
-            'databaseLoading'
-        );
-
-    if (!loading) {
-        return;
-    }
-
-    loading.innerHTML =
-
-        '<div class="database-loading-box">' +
-
-        '<div style="font-size:45px;">⚠️</div>' +
-
-        '<div style="margin-top:10px;">' +
-
-        'Database gagal dimuat' +
-
-        '</div>' +
-
-        '<button ' +
-
-        'onclick="location.reload()" ' +
-
-        'style="' +
-
-        'margin-top:20px;' +
-        'padding:10px 20px;' +
-        'border:0;' +
-        'border-radius:6px;' +
-        'background:#1976D2;' +
-        'color:white;' +
-        'font-weight:bold;' +
-        'cursor:pointer;' +
-
-        '">' +
-
-        'COBA LAGI' +
-
-        '</button>' +
-
-        '</div>';
-
-    loading.style.display =
-        'flex';
-
-}
-
-
-// ==================================================
-// CARI BARCODE SECARA LOKAL
-// ==================================================
-
-function findProductLocal(barcode) {
-
-    barcode =
-        String(
-            barcode || ''
-        ).trim();
-
-    if (!barcode) {
-        return null;
-    }
-
-    return barcodeMap[barcode] || null;
-
-}
-
-
-// ==================================================
 // AUTOCOMPLETE BARCODE
+// Database tetap di Google Sheet
+// Tidak download seluruh database
+// Maksimal 10 saran
+// ==================================================
+
+let suggestTimer = null;
+let suggestRequestId = 0;
+
+
+// ==================================================
+// GET SUGGESTION BOX
 // ==================================================
 
 function getSuggestionBox(nomor) {
@@ -781,6 +164,7 @@ function getSuggestionBox(nomor) {
 
 // ==================================================
 // SUGGEST BARCODE
+// Tanya langsung ke Apps Script
 // ==================================================
 
 function suggestBarcode(nomor) {
@@ -801,6 +185,7 @@ function suggestBarcode(nomor) {
     const keyword =
         input.value.trim();
 
+
     if (!keyword) {
 
         dropdown.innerHTML = '';
@@ -815,25 +200,12 @@ function suggestBarcode(nomor) {
 
     }
 
-    if (!databaseReady) {
 
-        return;
+    // ==================================================
+    // MINIMAL 3 DIGIT UNTUK AUTOCOMPLETE
+    // ==================================================
 
-    }
-
-    // ==============================================
-    // BARCODE EXACT
-    // ==============================================
-
-    const exact =
-        findProductLocal(
-            keyword
-        );
-
-    if (exact) {
-
-        nameElement.textContent =
-            exact.prod_nm || '';
+    if (keyword.length < 3) {
 
         dropdown.innerHTML = '';
 
@@ -845,131 +217,287 @@ function suggestBarcode(nomor) {
     }
 
 
-    // ==============================================
-    // AUTOCOMPLETE
-    // HANYA DARI AWAL BARCODE
-    // ==============================================
+    // ==================================================
+    // TUNGGU 300ms
+    // Supaya tidak request setiap ketikan
+    // ==================================================
 
-    if (
-        keyword.length < 3
-    ) {
-
-        dropdown.innerHTML = '';
-
-        dropdown.style.display =
-            'none';
-
-        return;
-
-    }
-
-    const suggestions = [];
-
-    for (
-        let i = 0;
-        i < barcodeDatabase.length;
-        i++
-    ) {
-
-        const item =
-            barcodeDatabase[i];
-
-        const barcode =
-            String(
-                item.barcode || ''
-            );
-
-        if (
-            barcode.startsWith(
-                keyword
-            )
-        ) {
-
-            suggestions.push(
-                item
-            );
-
-        }
-
-        if (
-            suggestions.length >= 10
-        ) {
-
-            break;
-
-        }
-
-    }
+    clearTimeout(
+        suggestTimer
+    );
 
 
-    dropdown.innerHTML = '';
+    const requestId =
+        ++suggestRequestId;
 
 
-    if (
-        suggestions.length === 0
-    ) {
+    suggestTimer =
+        setTimeout(
+            function() {
 
-        dropdown.style.display =
-            'none';
-
-        return;
-
-    }
-
-
-    suggestions.forEach(
-        function(item) {
-
-            const div =
-                document.createElement(
-                    'div'
+                requestBarcodeSuggestions(
+                    nomor,
+                    keyword,
+                    requestId
                 );
 
-            div.className =
-                'barcode-suggestion-item';
+            },
+            300
+        );
 
-            div.innerHTML =
-
-                '<div class="suggestion-barcode">' +
-                item.barcode +
-                '</div>' +
-
-                '<div class="suggestion-name">' +
-                item.prod_nm +
-                '</div>';
+}
 
 
-            div.addEventListener(
-                'mousedown',
-                function(event) {
+// ==================================================
+// REQUEST SUGGESTION KE SERVER
+// ==================================================
 
-                    event.preventDefault();
+function requestBarcodeSuggestions(
+    nomor,
+    keyword,
+    requestId
+) {
 
-                    input.value =
-                        item.barcode;
+    const input =
+        document.getElementById(
+            'barcode' + nomor
+        );
 
-                    nameElement.textContent =
-                        item.prod_nm;
+    const nameElement =
+        document.getElementById(
+            'productName' + nomor
+        );
 
-                    dropdown.innerHTML =
-                        '';
+    const dropdown =
+        getSuggestionBox(nomor);
 
-                    dropdown.style.display =
-                        'none';
+
+    const callbackName =
+        'suggestCallback_' +
+        nomor +
+        '_' +
+        Date.now();
+
+
+    const script =
+        document.createElement(
+            'script'
+        );
+
+
+    let finished = false;
+
+
+    function finish() {
+
+        if (finished) {
+            return;
+        }
+
+        finished = true;
+
+        delete window[callbackName];
+
+        if (script.parentNode) {
+
+            script.parentNode.removeChild(
+                script
+            );
+
+        }
+
+    }
+
+
+    // ==================================================
+    // CALLBACK JSONP
+    // ==================================================
+
+    window[callbackName] =
+        function(data) {
+
+            // Request lama diabaikan
+            if (
+                requestId !== suggestRequestId
+            ) {
+
+                finish();
+
+                return;
+
+            }
+
+
+            // Input sudah berubah
+            if (
+                input.value.trim() !== keyword
+            ) {
+
+                finish();
+
+                return;
+
+            }
+
+
+            dropdown.innerHTML = '';
+
+
+            if (
+                !data ||
+                !data.success ||
+                !Array.isArray(
+                    data.suggestions
+                )
+            ) {
+
+                dropdown.style.display =
+                    'none';
+
+                finish();
+
+                return;
+
+            }
+
+
+            const suggestions =
+                data.suggestions;
+
+
+            // ==================================================
+            // TIDAK ADA HASIL
+            // ==================================================
+
+            if (
+                suggestions.length === 0
+            ) {
+
+                dropdown.style.display =
+                    'none';
+
+                finish();
+
+                return;
+
+            }
+
+
+            // ==================================================
+            // TAMPILKAN HASIL
+            // ==================================================
+
+            suggestions.forEach(
+                function(item) {
+
+                    const div =
+                        document.createElement(
+                            'div'
+                        );
+
+                    div.className =
+                        'barcode-suggestion-item';
+
+
+                    div.innerHTML =
+
+                        '<div class="suggestion-barcode">' +
+                        item.barcode +
+                        '</div>' +
+
+                        '<div class="suggestion-name">' +
+                        (
+                            item.prod_nm || ''
+                        ) +
+                        '</div>';
+
+
+                    div.addEventListener(
+                        'mousedown',
+                        function(event) {
+
+                            event.preventDefault();
+
+
+                            input.value =
+                                item.barcode;
+
+
+                            nameElement.textContent =
+                                item.prod_nm || '';
+
+
+                            dropdown.innerHTML =
+                                '';
+
+                            dropdown.style.display =
+                                'none';
+
+
+                            // ==================================================
+                            // SETELAH PILIH BARCODE
+                            // TIDAK PERLU REQUEST SEARCH LAGI
+                            // ==================================================
+
+                        }
+                    );
+
+
+                    dropdown.appendChild(
+                        div
+                    );
 
                 }
             );
 
-            dropdown.appendChild(
-                div
-            );
 
-        }
+            dropdown.style.display =
+                'block';
+
+
+            finish();
+
+        };
+
+
+    // ==================================================
+    // ERROR
+    // ==================================================
+
+    script.onerror =
+        function() {
+
+            dropdown.innerHTML =
+                '';
+
+            dropdown.style.display =
+                'none';
+
+            finish();
+
+        };
+
+
+    // ==================================================
+    // REQUEST KE APPS SCRIPT
+    // ==================================================
+
+    script.src =
+        API_URL +
+        '?action=suggest' +
+        '&barcode=' +
+        encodeURIComponent(
+            keyword
+        ) +
+        '&callback=' +
+        encodeURIComponent(
+            callbackName
+        );
+
+
+    document.body.appendChild(
+        script
     );
-
-
-    dropdown.style.display =
-        'block';
 
 }
 
@@ -985,6 +513,7 @@ document.addEventListener(
         const target =
             event.target;
 
+
         if (
             target.tagName === 'INPUT' &&
             /^barcode[1-7]$/.test(
@@ -999,6 +528,7 @@ document.addEventListener(
                         ''
                     )
                 );
+
 
             suggestBarcode(
                 nomor
@@ -1042,6 +572,7 @@ document.addEventListener(
     }
 );
 
+
 // ==================================================
 // ENTER PADA BARCODE
 // ==================================================
@@ -1054,8 +585,10 @@ document.addEventListener(
             return;
         }
 
+
         const target =
             event.target;
+
 
         if (
             target.tagName === 'INPUT' &&
@@ -1067,6 +600,7 @@ document.addEventListener(
                     'barcode',
                     ''
                 );
+
 
             searchProduct(
                 Number(nomor)
